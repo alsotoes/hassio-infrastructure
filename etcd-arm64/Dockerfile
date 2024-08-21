@@ -1,6 +1,7 @@
 # Setup base
 ARG BITNAMI_ETCD_VERSION="3.5.15-debian-12-r6"
 ARG TARGETARCH="arm64"
+ARG BUILD_FROM="docker.io/bitnami/etcd@sha256:69d55890903b499946c9094a44d4ef3197f6fee7d6a849151f0ee4ee5adec1f0"
 # hadolint ignore=DL3006
 FROM --platform=linux/${TARGETARCH} ${BUILD_FROM}
 
