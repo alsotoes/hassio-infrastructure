@@ -1,7 +1,14 @@
 # Setup base
 ARG BITNAMI_ETCD_VERSION="3.5.15-debian-12-r6"
 ARG TARGETARCH="arm64"
-ARG BUILD_FROM="docker.io/bitnami/etcd@sha256:69d55890903b499946c9094a44d4ef3197f6fee7d6a849151f0ee4ee5adec1f0"
+# Build arguments
+ARG BUILD_DATE
+ARG BUILD_DESCRIPTION
+ARG BUILD_NAME
+ARG BUILD_REF
+ARG BUILD_REPOSITORY
+ARG BUILD_VERSION
+ARG BUILD_FROM
 # hadolint ignore=DL3006
 FROM --platform=linux/${TARGETARCH} ${BUILD_FROM}
 
@@ -10,22 +17,17 @@ ENV APP_VERSION="3.5.15" \
     ETCDCTL_API="3" \
     PATH="/opt/bitnami/common/bin:/opt/bitnami/etcd/bin:$PATH"
 
+# Set shell
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 EXPOSE 2379 2380
 
 WORKDIR /opt/bitnami/etcd
 USER 1001
+
+# Entrypoint & CMD
 ENTRYPOINT [ "/opt/bitnami/scripts/etcd/entrypoint.sh" ]
-
-# Define default command.
 CMD [ "/opt/bitnami/scripts/etcd/run.sh" ]
-
-# Build arguments
-ARG BUILD_DATE
-ARG BUILD_DESCRIPTION
-ARG BUILD_NAME
-ARG BUILD_REF
-ARG BUILD_REPOSITORY
-ARG BUILD_VERSION
 
 # Labels
 LABEL \

@@ -1,6 +1,6 @@
 ---
-name: ETCD Server
-version: "0.0.2"
+name: etcd Server
+version: "0.0.3"
 slug: etcd
 description: A distributed, reliable key-value store for the most critical data of a distributed system
 url: https://github.com/alsotoes/ha-addons/tree/main/etcd-arm64
@@ -9,14 +9,14 @@ init: false
 arch:
   - armv7
 init: false
-homeassistant_api: true
+homeassistant_api: false
 ingress: true
 ports:
   2379/tcp: 2379
   2380/tcp: 2380
 ports_description:
-  2379/tcp: ETCD client requests 
-  2380/tcp: ETCD peer communication
+  2379/tcp: etcd client requests 
+  2380/tcp: etcd peer communication
 panel_admin: false
 backup_exclude:
   - "**/opt/bitnami/etcd/bin/**"
