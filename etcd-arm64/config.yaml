@@ -1,0 +1,26 @@
+---
+name: ETCD Server
+version: alpha
+slug: etcd
+description: A distributed, reliable key-value store for the most critical data of a distributed system
+url: https://github.com/alsotoes/ha-addons/etcd-arm64
+startup: services
+init: false
+arch:
+  - armv7
+ports:
+  2379/tcp: 2379
+  2380/tcp: 2380
+ports_description:
+  2379/tcp: ETCD client requests 
+  2380/tcp: ETCD peer communication
+hassio_api: true
+backup_exclude:
+  - "**/opt/bitnami/etcd/bin/**"
+  - "**/opt/bitnami/etcd/conf.default/**"
+  - "**/opt/bitnami/etcd/tmp/**"
+options:
+  ETCD_LOG_LEVEL: "info"
+schema:
+  ETCD_LOG_LEVEL: list(trace|debug|info|notice|warning|error|fatal)?
+  ALLOW_NONE_AUTHENTICATION: yes

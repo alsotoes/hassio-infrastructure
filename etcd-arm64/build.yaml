@@ -1,0 +1,3 @@
+---
+build_from:
+  amd64: docker.io/bitnami/etcd@sha256:69d55890903b499946c9094a44d4ef3197f6fee7d6a849151f0ee4ee5adec1f0
