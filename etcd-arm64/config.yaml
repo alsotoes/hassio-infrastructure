@@ -24,6 +24,7 @@ backup_exclude:
   - "**/opt/bitnami/etcd/tmp/**"
 options:
   ETCD_LOG_LEVEL: "info"
+  ALLOW_NONE_AUTHENTICATION: "yes"
 schema:
   ETCD_LOG_LEVEL: list(trace|debug|info|notice|warning|error|fatal)?
-  ALLOW_NONE_AUTHENTICATION: yes
+  ALLOW_NONE_AUTHENTICATION: "str"
