@@ -16,18 +16,20 @@ ENV ETCD__VER="v3.5.15" \
     ARCH=${BUILD_ARCH:-amd64}
 
 RUN if [ "${ARCH}" = "aarch64" ] ;then ARCH="arm64" ; fi && \
-    apt-get update && apt-get install --no-install-recommends curl=7.74.0-1.3+deb11u12 -y && mkdir /tmp/etcd-download && \
+    apt-get update && apt-get install --no-install-recommends curl=7.74.0-1.3+deb11u12 ca-certificates=20210119 -y && mkdir /tmp/etcd-download && \
     curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz && \
     tar xzvf /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
     cp /tmp/etcd-download/etcd /tmp/etcd-download/etcdctl /tmp/etcd-download/etcdutl /usr/local/bin/ && \
     rm -f /tmp/etcd-${ETCD__VER}-linux-amd64.tar.gz && rm -rf /tmp/etcd-download && \
-    mkdir -p /var/lib/etcd && chmod 0700 /var/lib/etcd && \
     /usr/local/bin/etcd --version && /usr/local/bin/etcdctl version && /usr/local/bin/etcdutl version 
+
+RUN useradd -ms /bin/bash -d /var/lib/etcd etcd 
 
 COPY rootfs /
 RUN chmod +x /run.sh
 
-USER 1001
+USER etcd
+WORKDIR /var/lib/etcd
 EXPOSE 2379/tcp 2380/tcp
 HEALTHCHECK \
     --interval=5m \

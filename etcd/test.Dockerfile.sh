@@ -27,7 +27,7 @@ ${MANAGER} rmi 4978c5b7d4e4:latest || true
 ${MANAGER} build -t 4978c5b7d4e4:latest -f ./.4978c5b7d4e4.Containerfile
 ${MANAGER} image inspect 4978c5b7d4e4:latest
 
-${MANAGER} run \
+${MANAGER} run -d \
     -p 2379:2379 \
     -p 2380:2380 \
     --name etcd-cappy \
@@ -43,3 +43,6 @@ ${MANAGER} exec etcd-cappy /usr/local/bin/etcdutl version
 ${MANAGER} exec etcd-cappy /usr/local/bin/etcdctl endpoint health
 ${MANAGER} exec etcd-cappy /usr/local/bin/etcdctl put foo bar
 ${MANAGER} exec etcd-cappy /usr/local/bin/etcdctl get foo
+
+${MANAGER} stop etcd-cappy
+${MANAGER} rm etcd-cappy
