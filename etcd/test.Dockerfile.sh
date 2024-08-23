@@ -21,7 +21,7 @@ case $(uname -m) in
 esac
 
 if command -v podman &> /dev/null ; then MANAGER=podman ; else MANAGER=docker ; fi
-sed --expression "s/ARG BUILD_FROM/ARG BUILD_FROM=$(echo ${BUILD_FROM} | sed 's/\//\\\//g')/" ./Dockerfile | tee ./.4978c5b7d4e4.Containerfile
+sed --expression "s/ARG BUILD_FROM/ARG BUILD_FROM=$(echo "${BUILD_FROM}" | sed 's/\//\\\//g')/" ./Dockerfile | tee ./.4978c5b7d4e4.Containerfile
 
 ${MANAGER} rmi 4978c5b7d4e4:latest || true
 ${MANAGER} build -t 4978c5b7d4e4:latest -f ./.4978c5b7d4e4.Containerfile
