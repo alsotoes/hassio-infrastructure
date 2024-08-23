@@ -15,7 +15,7 @@ ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
     ARCH=${BUILD_ARCH:-amd64}
 
-RUN if [ "${ARCH}" = "aarch64" ] ;then $ARCH="arm64" ; fi && \
+RUN if [ "${ARCH}" = "aarch64" ] ;then ARCH="arm64" ; fi && \
     apt update && apt install curl -y && mkdir /tmp/etcd-download && \
     curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz && \
     tar xzvf /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
