@@ -1,14 +1,16 @@
 # Home Assistant Community Add-on: etcd
 
-![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield] ![Supports amd64 Architecture][amd64-shield]
+![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield] ![Supports aarch64 Architecture][aarch64-shield] ![Supports amd64 Architecture][amd64-shield]
+
 [armhf-shield]: https://img.shields.io/badge/armhf-no-red.svg
 [armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg
+[aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 
 **IMPORTANT:** 
 
 - **Only use this add-on if you are running home assistant on SSD drives** otherwise, the server will constantly fail because of low IO.
-- ETCD_INITIAL_CLUSTER_STATE is set to **existing** by default, so change this to **new** the first time you start the service to allow the node bootstrap and then change it back to **existing** to avoid destroying your data.
+- INITIAL_CLUSTER_STATE is set to **existing** by default, so change this to **new** the first time you start the service to allow the node bootstrap and then change it back to **existing** to avoid failure.
 
 ## About this integration
 
@@ -24,7 +26,7 @@ etcd is a distributed reliable key-value store for the most critical data of a d
 * *Fast*: benchmarked 10,000 writes/sec
 * *Reliable*: properly distributed using Raft
 
-etcd is written in Go and uses the [Raft][] consensus algorithm to manage a highly-available replicated log.
+etcd is written in Go and uses the [Raft](https://github.com/etcd-io/raft) [README.md](https://github.com/etcd-io/raft/blob/main/README.md) consensus algorithm to manage a highly-available replicated log.
 
 ### Environment variables
 
@@ -34,6 +36,7 @@ etcd is written in Go and uses the [Raft][] consensus algorithm to manage a high
 |-------------------------------|----------------------------------------------------------------------------------------------|-------------------------|
 | `LOG_LEVEL`                   | etcd log level.                                                                              | `info`                  |
 | `INITIAL_CLUSTER_STATE`       | Initial cluster state. Allowed values: "new" or "existing".                                  | `existing`              |
+| `NODE_NAME`                   | etcd member name.                                                                            | `nil`                   |
 
 ### Read-only environment variables
 
