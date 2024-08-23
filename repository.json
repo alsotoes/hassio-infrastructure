@@ -1,5 +1,5 @@
 {
-    "name": "etcd standalone database server",
+    "name": "Infrastructure add-ons",
     "url": "https://github.com/alsotoes/ha-addons",
     "maintainer": "Alvaro Soto <alsotoes@gmail.com>"
 }
