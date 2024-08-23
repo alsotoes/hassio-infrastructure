@@ -24,7 +24,7 @@ RUN if [ "${ARCH}" = "aarch64" ] ;then ARCH="arm64" ; fi && \
     mkdir -p /var/lib/etcd && chmod 0700 /var/lib/etcd && \
     /usr/local/bin/etcd --version && /usr/local/bin/etcdctl version && /usr/local/bin/etcdutl version 
 
-COPY run.sh /
+COPY rootfs /
 RUN chmod +x /run.sh
 
 USER 1001
