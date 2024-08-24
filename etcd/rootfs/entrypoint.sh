@@ -11,7 +11,7 @@ ARCH="$(echo $ARCH)"
 DOWNLOAD_URL="$(echo $DOWNLOAD_URL)"
 ETCD__VER="$(echo $ETCD__VER)"
 
-if [ -x "/usr/local/bin/etcd" ]
+if [ ! -x "/usr/local/bin/etcd" ]
 then
     # already installed, so do nothing 
     if [ "${ARCH}" = "aarch64" ]
