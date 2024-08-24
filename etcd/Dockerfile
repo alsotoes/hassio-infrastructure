@@ -18,9 +18,8 @@ ENV ETCD__VER="v3.5.15" \
 
 COPY rootfs /
 RUN chmod a+x /run.sh /entrypoint.sh 
-RUN useradd -ms /bin/bash -d /var/lib/etcd etcd
 
-USER etcd
+USER 1000
 WORKDIR /var/lib/etcd
 EXPOSE 2379/tcp 2380/tcp
 HEALTHCHECK \

@@ -28,5 +28,6 @@ then
     tar xzvf /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
     cp /tmp/etcd-download/etcd /tmp/etcd-download/etcdctl /tmp/etcd-download/etcdutl /usr/local/bin/ && \
     rm -f /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz && \
-    rm -rf /tmp/etcd-download
+    rm -rf /tmp/etcd-download && \
+    useradd -ms /bin/bash -d /var/lib/etcd etcd
 fi
