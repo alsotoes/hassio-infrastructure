@@ -16,8 +16,8 @@ ENV ETCD__VER="v3.5.15" \
     ARCH=${BUILD_ARCH:-amd64}
 
 # Fix DL4006
-#SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN if [ "${ARCH}" == "aarch64" ]; then ARCH="arm64"; fi && \
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN if test "${ARCH}" = "aarch64"; then ARCH="arm64"; fi && \
     apt-get update && apt-get install --no-install-recommends curl=7.74.0-1.3+deb11u12 ca-certificates=20210119 -y && mkdir /tmp/etcd-download && \
     curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz && \
     tar xzvf /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
