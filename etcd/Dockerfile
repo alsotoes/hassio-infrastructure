@@ -27,7 +27,7 @@ HEALTHCHECK \
     --timeout=3s \
     CMD curl -f http://127.0.0.1:2379/health || exit 1
 
-ENTRYPOINT["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/run.sh"]
 
 # Labels
