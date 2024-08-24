@@ -17,7 +17,8 @@ ENV ETCD__VER="v3.5.15" \
     ARCH=${BUILD_ARCH:-amd64}
 
 COPY rootfs /
-RUN chmod a+x /run.sh /entrypoint.sh
+RUN chmod a+x /run.sh /entrypoint.sh && \
+    useradd -ms /bin/bash -d /var/lib/etcd etcd
 
 USER etcd
 WORKDIR /var/lib/etcd
