@@ -15,9 +15,10 @@ ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
     ARCH=${BUILD_ARCH:-amd64}
 
-# Set shell
+# Fix DL4006
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN if [ "${ARCH}" = "aarch64" ] ;then ARCH="arm64" ; fi && \
+RUN set -eux; \ 
+    if [ "${ARCH}" = "aarch64" ]; then ARCH="arm64"; fi && \
     apt-get update && apt-get install --no-install-recommends curl=7.74.0-1.3+deb11u12 ca-certificates=20210119 -y && mkdir /tmp/etcd-download && \
     curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz && \
     tar xzvf /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
@@ -28,7 +29,7 @@ RUN if [ "${ARCH}" = "aarch64" ] ;then ARCH="arm64" ; fi && \
 RUN useradd -ms /bin/bash -d /var/lib/etcd etcd 
 
 COPY rootfs /
-RUN chmod +x /run.sh
+RUN chmod a+x /run.sh
 
 USER etcd
 WORKDIR /var/lib/etcd

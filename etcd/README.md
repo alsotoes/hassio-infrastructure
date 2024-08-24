@@ -49,3 +49,5 @@ etcd is written in Go and uses the [Raft](https://github.com/etcd-io/raft) [READ
 | `ETCD_ADVERTISE_CLIENT_URLS`       | List of this member client URLs to advertise to the rest of the cluster.                     | `http://0.0.0.0:2379`              |
 | `ETCD_LISTEN_PEER_URLS`            | List of URLs to listen on for peers traffic.                                                 | `http://0.0.0.0:2380`              |
 | `ETCD_INITIAL_ADVERTISE_PEER_URLS` | List of this member peer URLs to advertise to the rest of the cluster while bootstrapping.   | `http://0.0.0.0:2380`              |
+| `ETCD_DAEMON_USER`                 | etcd system user name.                                                                       | `etcd`                             |
+| `ETCD_DAEMON_GROUP`                | etcd system user group.                                                                      | `etcd`                             |
