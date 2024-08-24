@@ -16,18 +16,8 @@ ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
     ARCH=${BUILD_ARCH:-amd64}
 
-# Fix DL4006
-RUN apt-get update && apt-get install --no-install-recommends curl=7.74.0-1.3+deb11u12 ca-certificates=20210119 -y && mkdir /tmp/etcd-download && \
-    if [ "${ARCH}" = "aarch64" ]; then ARCH="arm64"; fi && \
-    curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz && \
-    tar xzvf /tmp/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
-    cp /tmp/etcd-download/etcd /tmp/etcd-download/etcdctl /tmp/etcd-download/etcdutl /usr/local/bin/ && \
-    rm -f /tmp/etcd-${ETCD__VER}-linux-amd64.tar.gz && rm -rf /tmp/etcd-download
-
-RUN useradd -ms /bin/bash -d /var/lib/etcd etcd 
-
 COPY rootfs /
-RUN chmod a+x /run.sh
+RUN chmod a+x /run.sh /entrypoint.sh
 
 USER etcd
 WORKDIR /var/lib/etcd
@@ -37,6 +27,7 @@ HEALTHCHECK \
     --timeout=3s \
     CMD curl -f http://127.0.0.1:2379/health || exit 1
 
+ENTRYPOINT["/entrypoint.sh"]
 CMD ["/run.sh"]
 
 # Labels
