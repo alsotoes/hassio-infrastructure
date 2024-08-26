@@ -10,14 +10,20 @@ ARG BUILD_FROM
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
-# Set shell
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
-    ARCH=${BUILD_ARCH:-amd64}
+    ARCH="aarch64"
+
+VOLUME ["/var/lib/etcd"]
+RUN useradd -ms /bin/bash -d /var/lib/etcd etcd && mkdir -p /var/lib/etcd/data /tmp/etcd-download && \
+    apt-get update && apt-get install --no-install-recommends curl=7.74.0-1.3+deb11u12 -y && \
+    curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd.tar.gz && \
+    tar xzvf /tmp/etcd.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
+    cp /tmp/etcd-download/etcd /tmp/etcd-download/etcdctl /tmp/etcd-download/etcdutl /usr/local/bin/ && \
+    rm -f /tmp/etcd.tar.gz && rm -rf /tmp/etcd-download
 
 COPY rootfs /
-RUN chmod a+x /run.sh /entrypoint.sh 
+RUN chmod a+x /run.sh 
 
 USER 1000
 WORKDIR /var/lib/etcd
@@ -27,7 +33,6 @@ HEALTHCHECK \
     --timeout=3s \
     CMD curl -f http://127.0.0.1:2379/health || exit 1
 
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/run.sh"]
 
 # Labels

@@ -3,16 +3,15 @@ name: etcd Server
 version: "0.0.5"
 slug: etcd
 description: A distributed, reliable key-value store for the most critical data of a distributed system
-url: https://github.com/alsotoes/ha-addons/tree/main/etcd
+url: https://github.com/alsotoes/hassio-addons/tree/main/etcd
 init: false
 arch:
   - armv7
   - aarch64
-  - amd64
 panel_admin: false
 ports:
-  2379/tcp: null
-  2380/tcp: null
+  2379/tcp: etcd client requests 
+  2380/tcp: etcd peer communication
 options:
   INITIAL_CLUSTER_STATE: "existing"
   LOG_LEVEL: "info"

@@ -42,12 +42,13 @@ etcd is written in Go and uses the [Raft](https://github.com/etcd-io/raft) [READ
 
 | Name                               | Description                                                                                  | Value                              |
 |------------------------------------|----------------------------------------------------------------------------------------------|------------------------------------|
+| `ETCD_HOME_USER_DIR`               | etcd user HOME directory.                                                                    | `/var/lib/etcd`                    |
+| `ETCD_DAEMON_USER`                 | etcd system user name.                                                                       | `etcd`                             |
+| `ETCD_DAEMON_GROUP`                | etcd system user group.                                                                      | `etcd`                             |
 | `ETCDCTL_API`                      | etcdctl API version.                                                                         | `3`                                |
-| `ETCD_DATA_DIR`                    | etcd data directory.                                                                         | `/var/lib/etcd`                    |
-| `ETCD_LOG_OUTPUTS`                 | ‘stderr’ to skip journald logging even when running under systemd                            | `stderr`                           |
+| `ETCD_DATA_DIR`                    | etcd data directory.                                                                         | `/var/lib/etcd/data`               |
+| `ETCD_LOG_OUTPUTS`                 | Set to ‘stderr’ to skip journald logging even when running under systemd                     | `stderr`                           |
 | `ETCD_LISTEN_CLIENT_URLS`          | List of URLs to listen on for client traffic.                                                | `http://0.0.0.0:2379`              |
 | `ETCD_ADVERTISE_CLIENT_URLS`       | List of this member client URLs to advertise to the rest of the cluster.                     | `http://0.0.0.0:2379`              |
 | `ETCD_LISTEN_PEER_URLS`            | List of URLs to listen on for peers traffic.                                                 | `http://0.0.0.0:2380`              |
 | `ETCD_INITIAL_ADVERTISE_PEER_URLS` | List of this member peer URLs to advertise to the rest of the cluster while bootstrapping.   | `http://0.0.0.0:2380`              |
-| `ETCD_DAEMON_USER`                 | etcd system user name.                                                                       | `etcd`                             |
-| `ETCD_DAEMON_GROUP`                | etcd system user group.                                                                      | `etcd`                             |
