@@ -17,5 +17,4 @@ set -ex
   --initial-cluster "${NODE_NAME:-etcd}"=http://0.0.0.0:2380 \
   --initial-cluster-state "${INITIAL_CLUSTER_STATE:-new}" \
   --log-level "${LOG_LEVEL:-info}" \
-  --logger "${LOGGER:-capnslog}" \
   --log-outputs stderr

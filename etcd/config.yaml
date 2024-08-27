@@ -18,12 +18,10 @@ ports_description:
 options:
   INITIAL_CLUSTER_STATE: "existing"
   LOG_LEVEL: "info"
-  LOGGER: "zap"
   NODE_NAME: "homeassistant"
 schema:
   INITIAL_CLUSTER_STATE: list(existing|new)?
   LOG_LEVEL: list(debug|info|warn|error|panic|fatal)?
-  LOGGER: list(zap|capnslog)?
   NODE_NAME: "str"
 startup: system
 timeout: 300
