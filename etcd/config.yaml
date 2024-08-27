@@ -10,8 +10,11 @@ arch:
   - aarch64
 panel_admin: false
 ports:
-  2379/tcp: etcd client requests 
-  2380/tcp: etcd peer communication
+  2379/tcp: 2379
+  2380/tcp: 2380
+ports_description:
+  2379/tcp: ETCD client requests 
+  2380/tcp: ETCD peer communication
 options:
   INITIAL_CLUSTER_STATE: "existing"
   LOG_LEVEL: "info"
