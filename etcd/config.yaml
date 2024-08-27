@@ -13,7 +13,7 @@ ports:
   2379/tcp: 2379
   2380/tcp: 2380
 ports_description:
-  2379/tcp: ETCD client requests 
+  2379/tcp: ETCD client requests
   2380/tcp: ETCD peer communication
 options:
   INITIAL_CLUSTER_STATE: "existing"
@@ -27,6 +27,6 @@ startup: system
 timeout: 300
 map:
   - type: data
-    read_only: False
+    read_only: false
   - type: backup
-    read_only: False
+    read_only: false
