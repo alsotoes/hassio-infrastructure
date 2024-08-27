@@ -12,11 +12,10 @@ FROM ${BUILD_FROM}
 
 ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
-    ARCH="aarch64"
+    ARCH="arm64"
 
 VOLUME ["/var/lib/etcd"]
-RUN useradd -ms /bin/bash -d /var/lib/etcd etcd && mkdir -p /var/lib/etcd/data /tmp/etcd-download && \
-    apt-get update && apt-get install --no-install-recommends curl=7.74.0-1.3+deb11u12 -y && \
+RUN addgroup etcd && adduser -s /bin/bash -h /var/lib/etcd -D -G etcd etcd && mkdir -p /var/lib/etcd/data /tmp/etcd-download && \
     curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd.tar.gz && \
     tar xzvf /tmp/etcd.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
     cp /tmp/etcd-download/etcd /tmp/etcd-download/etcdctl /tmp/etcd-download/etcdutl /usr/local/bin/ && \

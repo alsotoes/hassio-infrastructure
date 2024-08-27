@@ -1,7 +1,7 @@
 ---
 build_from:
-  armv7: bitnami/minideb:bullseye@sha256:46a2e62e27315369e06c205f7c2b74f1766e72dd7fdf6071860292314ca6b114
-  aarch64: bitnami/minideb:bullseye@sha256:46a2e62e27315369e06c205f7c2b74f1766e72dd7fdf6071860292314ca6b114
+  armv7:  ghcr.io/home-assistant/armv7-base
+  aarch64:  ghcr.io/home-assistant/aarch64-base
 codenotary:
   base_image: notary@home-assistant.io
   signer: notary@home-assistant.io
