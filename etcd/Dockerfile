@@ -14,7 +14,6 @@ ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
     ARCH="arm64"
 
-VOLUME ["/var/lib/etcd"]
 RUN addgroup etcd && adduser -s /bin/bash -h /var/lib/etcd -D -G etcd etcd && mkdir -p /var/lib/etcd/data /tmp/etcd-download && \
     curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd.tar.gz && \
     tar xzvf /tmp/etcd.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \

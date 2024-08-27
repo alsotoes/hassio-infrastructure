@@ -9,7 +9,7 @@ set -ex
 
 /usr/local/bin/etcd \
   --name "${NODE_NAME:-etcd}" \
-  --data-dir /var/lib/etcd/data \
+  --data-dir /data \
   --listen-client-urls http://0.0.0.0:2379 \
   --advertise-client-urls http://0.0.0.0:2379 \
   --listen-peer-urls http://0.0.0.0:2380 \

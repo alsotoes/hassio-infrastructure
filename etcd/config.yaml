@@ -25,3 +25,5 @@ schema:
   NODE_NAME: "str"
 startup: system
 timeout: 300
+map:
+  - data:rw
