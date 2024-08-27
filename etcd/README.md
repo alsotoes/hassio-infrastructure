@@ -37,9 +37,6 @@ etcd is written in Go and uses the [Raft](https://github.com/etcd-io/raft) [READ
 
 | Name                               | Description                                                                                  | Value                              |
 |------------------------------------|----------------------------------------------------------------------------------------------|------------------------------------|
-| `ETCD_HOME_USER_DIR`               | etcd user HOME directory.                                                                    | `/var/lib/etcd`                    |
-| `ETCD_DAEMON_USER`                 | etcd system user name.                                                                       | `etcd`                             |
-| `ETCD_DAEMON_GROUP`                | etcd system user group.                                                                      | `etcd`                             |
 | `ETCDCTL_API`                      | etcdctl API version.                                                                         | `3`                                |
 | `ETCD_DATA_DIR`                    | etcd data directory.                                                                         | `/data`                            |
 | `ETCD_LOG_OUTPUTS`                 | Set to ‘stderr’ to skip journald logging even when running under systemd                     | `stderr`                           |
