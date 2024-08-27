@@ -1,5 +1,5 @@
 {
     "name": "Infrastructure add-ons",
-    "url": "http://silvia.headup.local:3333/headup/hassio-addons-local",
+    "url": "https://github.com/alsotoes/hassio-addons",
     "maintainer": "Alvaro Soto <alsotoes@gmail.com>"
 }
