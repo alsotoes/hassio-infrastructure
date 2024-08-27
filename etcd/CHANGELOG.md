@@ -2,12 +2,11 @@
 
 ## 0.0.6
 
-- Change to home-assistant image
-- Share data forder instead using docker volumes
-- Run as root instead of etcd to use /data folder
-- /data and /backups mounted RW
+- Change to home-assistant image.
+- Share data forder instead using docker volumes.
+- Run as root instead of etcd to use /data folder.
+- /data and /backups mounted RW.
 - Tests passed: put, get, delete.
-  - From: https://github.com/etcd-io/etcd/releases
 
 ## 0.0.5
 
@@ -17,7 +16,7 @@
 ## 0.0.4
 
 - Uses etcd **v3.5.15**
-- Download url set to **https://storage.googleapis.com/etcd**
+- Download url set to https://storage.googleapis.com/etcd
 - **arm64/aarch64** is the only supported architecture
 - Too buggy to share
 
