@@ -14,7 +14,7 @@ ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
     ARCH="arm64"
 
-RUN addgroup etcd && adduser -s /bin/bash -h /var/lib/etcd -D -G etcd etcd && mkdir -p /var/lib/etcd/data /tmp/etcd-download && \
+RUN mkdir -p /tmp/etcd-download && \
     curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd.tar.gz && \
     tar xzvf /tmp/etcd.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
     cp /tmp/etcd-download/etcd /tmp/etcd-download/etcdctl /tmp/etcd-download/etcdutl /usr/local/bin/ && \
@@ -23,8 +23,7 @@ RUN addgroup etcd && adduser -s /bin/bash -h /var/lib/etcd -D -G etcd etcd && mk
 COPY rootfs /
 RUN chmod a+x /run.sh 
 
-USER 1000
-WORKDIR /var/lib/etcd
+WORKDIR /
 EXPOSE 2379/tcp 2380/tcp
 HEALTHCHECK \
     --interval=5m \
