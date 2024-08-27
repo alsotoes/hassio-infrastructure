@@ -26,4 +26,7 @@ schema:
 startup: system
 timeout: 300
 map:
-  - data:rw
+  - type: data
+    read_only: False
+  - type: backup
+    read_only: False
