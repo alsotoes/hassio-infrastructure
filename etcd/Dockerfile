@@ -12,10 +12,11 @@ FROM ${BUILD_FROM}
 
 ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
-    ARCH="arm64" \
-    INITIAL_CLUSTER_STATE="${INITIAL_CLUSTER_STATE}" \
-    LOG_LEVEL="${LOG_LEVEL}" \
-    NODE_NAME="${NODE_NAME}"
+    ARCH="arm64"
+
+ARG INITIAL_CLUSTER_STATE
+ARG LOG_LEVEL
+ARG NODE_NAME
 
 RUN mkdir -p /tmp/etcd-download && \
     curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd.tar.gz && \
