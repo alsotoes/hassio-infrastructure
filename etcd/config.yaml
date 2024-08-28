@@ -14,13 +14,13 @@ ports:
   2379/tcp: 2379
   2380/tcp: 2380
 options:
-  INITIAL_CLUSTER_STATE: "existing"
-  LOG_LEVEL: "info"
-  NODE_NAME: "homeassistant"
+  initial_cluster_state: "existing"
+  log_level: "info"
+  node_name: "homeassistant"
 schema:
-  INITIAL_CLUSTER_STATE: list(existing|new)?
-  LOG_LEVEL: list(debug|info|warn|error|panic|fatal)?
-  NODE_NAME: "str"
+  initial_cluster_state: list(existing|new)?
+  log_level: list(debug|info|warn|error|panic|fatal)?
+  node_name: "str"
 startup: system
 timeout: 300
 map:
