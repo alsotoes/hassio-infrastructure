@@ -4,6 +4,7 @@ version: "0.0.7"
 slug: etcd
 description: A distributed, reliable key-value store for the most critical data of a distributed system
 url: https://github.com/alsotoes/hassio-infrastructure/tree/main/etcd
+hassio_api: true
 init: false
 arch:
   - armv7
