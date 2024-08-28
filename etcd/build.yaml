@@ -1,7 +1,7 @@
 ---
 build_from:
-  armv7: ghcr.io/home-assistant/armv7-base
-  aarch64: ghcr.io/home-assistant/aarch64-base
+  armv7: ghcr.io/hassio-addons/base:16.2.0
+  aarch64: ghcr.io/hassio-addons/base:16.2.0
 codenotary:
   base_image: notary@home-assistant.io
   signer: notary@home-assistant.io

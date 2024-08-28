@@ -2,15 +2,15 @@ ARG BUILD_FROM
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
-ENV ETCD__VER="v3.5.15" \
+ENV ETCD_VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
     ARCH="arm64" 
 
 RUN mkdir -p /tmp/etcd-download && \
-    curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd.tar.gz && \
+    curl -L ${DOWNLOAD_URL}/${ETCD_VER}/etcd-${ETCD_VER}-linux-${ARCH}.tar.gz -o /tmp/etcd.tar.gz && \
     tar xzvf /tmp/etcd.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
     cp /tmp/etcd-download/etcd /tmp/etcd-download/etcdctl /tmp/etcd-download/etcdutl /usr/local/bin/ && \
-    rm -f /tmp/etcd.tar.gz && rm -rf /tmp/etcd-download
+    rm -rf /tmp/*
 
 COPY rootfs /
 RUN chmod a+x /run.sh 
@@ -41,14 +41,12 @@ LABEL \
     io.hass.type="addon" \
     io.hass.version=${BUILD_VERSION} \
     maintainer="Alvaro Soto <alsotoes@gmail.com>" \
-    org.opencontainers.image.title="${BUILD_NAME}" \
+    org.opencontainers.image.title="${BUILD_NAME}, ${BUILD_DESCRIPTION}" \
     org.opencontainers.image.description="${BUILD_DESCRIPTION}" \
     org.opencontainers.image.vendor="Alvaro Soto" \
     org.opencontainers.image.authors="Alvaro Soto <alsotoes@gmail.com>" \
     org.opencontainers.image.licenses="GPL-3.0 license" \
     org.opencontainers.image.url="https://headup.ws" \
-    org.opencontainers.image.source="https://github.com/${BUILD_REPOSITORY}" \
-    org.opencontainers.image.documentation="https://github.com/${BUILD_REPOSITORY}/blob/main/README.md" \
     org.opencontainers.image.created=${BUILD_DATE} \
-    org.opencontainers.image.revision=${BUILD_REF} \
+    org.opencontainers.image.revision=${BUILD_VERSION} \
     org.opencontainers.image.version=${BUILD_VERSION}

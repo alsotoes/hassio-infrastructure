@@ -1,2 +1,4 @@
 # etcd addon
+member/
+../member/
 etcd/.4978c5b7d4e4.Containerfile
