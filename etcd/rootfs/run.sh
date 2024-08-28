@@ -8,13 +8,13 @@ set -ex
 ( set -o pipefail 2> /dev/null ) || true
 
 /usr/local/bin/etcd \
-  --name "${NODE_NAME:-etcd}" \
+  --name "$(bashio::config 'NODE_NAME')" \
   --data-dir /data \
   --listen-client-urls http://0.0.0.0:2379 \
   --advertise-client-urls http://0.0.0.0:2379 \
   --listen-peer-urls http://0.0.0.0:2380 \
   --initial-advertise-peer-urls http://0.0.0.0:2380 \
-  --initial-cluster "${NODE_NAME:-etcd}"=http://0.0.0.0:2380 \
-  --initial-cluster-state "${INITIAL_CLUSTER_STATE:-new}" \
-  --log-level "${LOG_LEVEL:-info}" \
+  --initial-cluster "$(bashio::config 'NODE_NAME')"=http://0.0.0.0:2380 \
+  --initial-cluster-state "$(bashio::config 'INITIAL_CLUSTER_STATE')" \
+  --log-level "$(bashio::config 'LOG_LEVEL')" \
   --log-outputs stderr

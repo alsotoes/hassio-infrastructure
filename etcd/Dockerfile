@@ -1,25 +1,10 @@
-# Build arguments
-ARG BUILD_DATE
-ARG BUILD_DESCRIPTION
-ARG BUILD_NAME
-ARG BUILD_REF
-ARG BUILD_REPOSITORY
-ARG BUILD_VERSION
-ARG BUILD_ARCH
 ARG BUILD_FROM
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
-ARG INITIAL_CLUSTER_STATE
-ARG LOG_LEVEL
-ARG NODE_NAME
-
 ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
-    ARCH="arm64" \
-    INITIAL_CLUSTER_STATE=${INITIAL_CLUSTER_STATE} \
-    LOG_LEVEL=${LOG_LEVEL} \
-    NODE_NAME=${NODE_NAME}
+    ARCH="arm64" 
 
 RUN mkdir -p /tmp/etcd-download && \
     curl -L ${DOWNLOAD_URL}/${ETCD__VER}/etcd-${ETCD__VER}-linux-${ARCH}.tar.gz -o /tmp/etcd.tar.gz && \
@@ -38,6 +23,15 @@ HEALTHCHECK \
     CMD curl -f http://127.0.0.1:2379/health || exit 1
 
 CMD ["/run.sh"]
+
+# Build arguments
+ARG BUILD_DATE
+ARG BUILD_DESCRIPTION
+ARG BUILD_NAME
+ARG BUILD_REF
+ARG BUILD_REPOSITORY
+ARG BUILD_VERSION
+ARG BUILD_ARCH
 
 # Labels
 LABEL \
