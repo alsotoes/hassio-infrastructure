@@ -16,9 +16,9 @@ ARG NODE_NAME
 
 ENV ETCD__VER="v3.5.15" \
     DOWNLOAD_URL="https://storage.googleapis.com/etcd" \
-    ARCH="arm64"
-    INITIAL_CLUSTER_STATE
-    LOG_LEVEL
+    ARCH="arm64" \
+    INITIAL_CLUSTER_STATE \
+    LOG_LEVEL \
     NODE_NAME
 
 RUN mkdir -p /tmp/etcd-download && \
