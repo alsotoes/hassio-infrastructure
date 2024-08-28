@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.7
+
+- Fix: errors getting enviromental variables
+- Disable port changing
+
 ## 0.0.6
 
 - Change to home-assistant image.
