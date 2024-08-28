@@ -10,8 +10,8 @@ arch:
   - aarch64
 panel_admin: false
 ports:
-  2379/tcp: null
-  2380/tcp: null
+  2379/tcp: 2379
+  2380/tcp: 2380
 options:
   INITIAL_CLUSTER_STATE: "existing"
   LOG_LEVEL: "info"
