@@ -26,5 +26,3 @@ timeout: 300
 map:
   - type: data
     read_only: false
-  - type: backup
-    read_only: false
