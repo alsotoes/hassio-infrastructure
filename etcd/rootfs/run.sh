@@ -11,7 +11,7 @@ etcd_initial_cluster_state="$(bashio::config 'initial_cluster_state')"
 etcd_initial_cluster="$(bashio::config 'node_name')=http://0.0.0.0:2380"
 etcd_log_level="$(bashio::config 'log_level')"
 
-if [ bashio::config.has_value 'node_name' ] ; then
+if bashio::config.has_value 'node_name'; then
     export ETCD_NAME=${etcd_name}
     export ETCD_INITIAL_CLUSTER_STATE=${etcd_initial_cluster_state}
     export ETCD_INITIAL_CLUSTER="${etcd_initial_cluster}"
