@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3
+
+- Moving Samsung support to suld drivers
+
 ## 0.0.2
 
 - Add splix driver to image
