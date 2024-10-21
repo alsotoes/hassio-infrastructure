@@ -5,7 +5,8 @@ LABEL io.hass.version="1.0" io.hass.type="addon" io.hass.arch="aarch64|amd64"
 # Set shell
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN wget https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all.deb && dpkg -i suldr-keyring_2_all.deb \
+COPY rootfs /
+RUN dpkg -i /etc/cups/suldr-keyring_2_all.deb \
     echo "deb https://www.bchemnet.com/suldr/ debian extra" >> /etc/apt/sources.list && apt-get update \
     && apt-get install -y --no-install-recommends \
         sudo \
@@ -32,9 +33,7 @@ RUN wget https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all
         suld-driver2* \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -f suldr-keyring_2_all.deb
-
-COPY rootfs /
+    && rm -f /etc/cups/suldr-keyring_2_all.deb
 
 # Add user and disable sudo password checking
 RUN useradd \
