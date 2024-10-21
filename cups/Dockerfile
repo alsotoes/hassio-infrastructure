@@ -15,6 +15,7 @@ RUN apt-get update \
         dbus \
         colord \
         printer-driver-all \
+        printer-driver-splix \
         printer-driver-gutenprint \
         openprinting-ppds \
         hpijs-ppds \
@@ -24,9 +25,7 @@ RUN apt-get update \
         cups-pdf \
         gnupg2 \
         lsb-release \
-        nano \
         samba \
-        bash-completion \
         procps \
         whois \
     && apt-get clean -y \
