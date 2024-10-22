@@ -26,7 +26,9 @@ RUN apt-get update \
         samba \
         procps \
         whois \
-        wget
+        wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN wget -q https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all.deb \
     && echo "deb https://www.bchemnet.com/suldr/ debian extra" >> /etc/apt/sources.list \
