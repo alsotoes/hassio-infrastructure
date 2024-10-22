@@ -28,7 +28,7 @@ RUN apt-get update \
         whois \
         wget
 
-RUN wget https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all.deb \
+RUN wget -q https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all.deb \
     && echo "deb https://www.bchemnet.com/suldr/ debian extra" >> /etc/apt/sources.list \
     && dpkg -i suldr-keyring_2_all.deb && apt-get update \
     && apt-get install -y suld-driver2* && apt-get clean -y \

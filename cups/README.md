@@ -9,5 +9,7 @@
 
 ![cups Logo](https://upload.wikimedia.org/wikipedia/commons/7/71/CUPS.svg)
 
+I added and tested Samsung suppport by using [suld](https://www.bchemnet.com/suldr/suld.html) and I got ppd file from [HP support page](https://support.hp.com/ee-en/drivers/samsung-xpress-sl-m2020-laser-printer-series/16462592).
+
 # First commit from this dir is a fork from [here](https://github.com/zajac-grzegorz/homeassistant-addon-cups-airprint/commit/33829052e4ddf006c15060c65cad6a1c2f0f280d).
 homeassistant-addon-cups-airprint, original can be found [here](https://github.com/alsotoes/hassio-infrastructure/blob/main/cups/README.homeassistant-addon-cups-airprint.md)
