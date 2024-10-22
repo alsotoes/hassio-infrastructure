@@ -1,14 +1,9 @@
 FROM ghcr.io/hassio-addons/debian-base:7.1.0
 
-LABEL io.hass.version="1.0" io.hass.type="addon" io.hass.arch="aarch64|amd64"
-
 # Set shell
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN wget https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all.deb \
-    && dpkg -i suldr-keyring_2_all.deb \
-    && echo "deb https://www.bchemnet.com/suldr/ debian extra" >> /etc/apt/sources.list \
-    && apt-get update \
+RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         sudo \
         locales \
@@ -31,10 +26,13 @@ RUN wget https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all
         samba \
         procps \
         whois \
-        suld-driver2* \
-    && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -f suldr-keyring_2_all.deb
+        wget
+
+RUN wget https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all.deb \
+    && echo "deb https://www.bchemnet.com/suldr/ debian extra" >> /etc/apt/sources.list \
+    && dpkg -i suldr-keyring_2_all.deb && apt-get update \
+    && apt-get install -y suld-driver2* && apt-get clean -y \
+    && rm -f suldr-keyring_2_all.deb && rm -rf /var/lib/apt/lists/*
 
 COPY rootfs /
 
@@ -53,3 +51,30 @@ EXPOSE 631
 RUN chmod a+x /run.sh
 
 CMD ["/run.sh"]
+
+# Build arguments
+ARG BUILD_DATE
+ARG BUILD_DESCRIPTION
+ARG BUILD_NAME
+ARG BUILD_REF
+ARG BUILD_REPOSITORY
+ARG BUILD_VERSION
+ARG BUILD_ARCH
+
+# Labels
+LABEL \
+    io.hass.name="${BUILD_NAME}" \
+    io.hass.description="${BUILD_DESCRIPTION}" \
+    io.hass.arch="${BUILD_ARCH}" \
+    io.hass.type="addon" \
+    io.hass.version=${BUILD_VERSION} \
+    maintainer="Alvaro Soto <alsotoes@gmail.com>" \
+    org.opencontainers.image.title="${BUILD_NAME}, ${BUILD_DESCRIPTION}" \
+    org.opencontainers.image.description="${BUILD_DESCRIPTION}" \
+    org.opencontainers.image.vendor="Alvaro Soto" \
+    org.opencontainers.image.authors="Alvaro Soto <alsotoes@gmail.com>" \
+    org.opencontainers.image.licenses="GPL-3.0 license" \
+    org.opencontainers.image.url="https://headup.ws" \
+    org.opencontainers.image.created=${BUILD_DATE} \
+    org.opencontainers.image.revision=${BUILD_VERSION} \
+    org.opencontainers.image.version=${BUILD_VERSION}
