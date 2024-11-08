@@ -39,11 +39,9 @@ etcd is a distributed reliable key-value store for the most critical data of a d
 
 ## License
 
-[License](LICENSE.md)
+GNU GENERAL PUBLIC [LICENSE](LICENSE.md) Version 3
 
-GNU GENERAL PUBLIC LICENSE, Version 3
-
-+
+Also, have the following in mind.
 
 THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
