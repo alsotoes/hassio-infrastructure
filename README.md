@@ -2,13 +2,13 @@
 
 ## About
 
-Because I use these addons in my setup, I plan to maintain this repo.
-I use it on a raspberry so that's why I only test for arm64 architecture.
-PR are definetly welcome.
+I plan to maintain this repo because I use these addons in my setup.
+I use it on a raspberry, so I only test for arm64 architecture.
+PR are definitely welcome.
 
 ## Installation
 
-Adding this add-ons repository to your Home Assistant instance is pretty easy. In the
+Adding this add-ons repository to your Home Assistant instance is easy. In the
 Home Assistant add-on store, a possibility to add a repository is provided.
 
 Use the following URL to add this repository:
@@ -39,11 +39,13 @@ etcd is a distributed reliable key-value store for the most critical data of a d
 
 ## License
 
-[![License][license-shield]](LICENSE.md)
+[License](LICENSE.md)
 
 GNU GENERAL PUBLIC LICENSE, Version 3
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
