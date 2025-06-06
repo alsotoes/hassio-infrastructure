@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.8
+
+- Fix: issues/3
+- Update to etcd v3.5.0
+- Check for ETCD_INITIAL_CLUSTER_STATE now in run.sh
+- Update hassio image to latest
+- Adding support for amd64
+
 ## 0.0.7
 
 - Fix: errors getting enviromental variables

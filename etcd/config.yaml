@@ -1,26 +1,18 @@
 ---
 name: etcd Server
-version: "0.0.7"
+version: "0.0.8"
 slug: etcd
 description: A distributed, reliable key-value store for the most critical data of a distributed system
 url: https://github.com/alsotoes/hassio-infrastructure/tree/main/etcd
-hassio_api: true
 init: false
 arch:
   - armv7
   - aarch64
+  - amd64
 panel_admin: false
 ports:
   2379/tcp: 2379
   2380/tcp: 2380
-options:
-  initial_cluster_state: "existing"
-  log_level: "info"
-  node_name: "homeassistant"
-schema:
-  initial_cluster_state: list(existing|new)?
-  log_level: list(debug|info|warn|error|panic|fatal)?
-  node_name: "str"
 startup: system
 timeout: 300
 map:
