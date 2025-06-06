@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2
+
+- No changes on packages or configuration
+- Adding amd64 on config files
+- Jumping to version 1.x since v1.0 was a clone from pzajac-grzegorz's public repo
+
+## 0.0.4
+
+- Fix issue#1 for packages running image in  amd64 architecture: https://github.com/alsotoes/hassio-infrastructure/issues/1
+
 ## 0.0.3
 
 - Moving Samsung support to suld drivers

@@ -1,4 +1,5 @@
-FROM ghcr.io/hassio-addons/debian-base:7.1.0
+ARG BUILD_FROM
+FROM ${BUILD_FROM}
 
 # Set shell
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -33,7 +34,7 @@ RUN apt-get update \
 RUN wget -q https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_all.deb \
     && echo "deb https://www.bchemnet.com/suldr/ debian extra" >> /etc/apt/sources.list \
     && dpkg -i suldr-keyring_2_all.deb && apt-get update \
-    && apt-get install -y suld-driver2* && apt-get clean -y \
+    && apt-get install -y suld-driver2-1.00.39hp && apt-get clean -y \
     && rm -f suldr-keyring_2_all.deb && rm -rf /var/lib/apt/lists/*
 
 COPY rootfs /
