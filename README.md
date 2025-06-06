@@ -21,6 +21,7 @@ https://github.com/alsotoes/hassio-infrastructure
 
 ### &#10003; [cups addon](https://github.com/alsotoes/hassio-infrastructure/blob/main/cups)
 
+![Supports amd64 Architecture][amd64-shield] 
 ![Supports aarch64 Architecture][aarch64-shield] 
 ![Supports armv7 Architecture][armv7-shield]
 
@@ -30,6 +31,7 @@ CUPS is a modular printing system for Unix-like computer operating systems which
 
 ### &#10003; [etcd addon](https://github.com/alsotoes/hassio-infrastructure/blob/main/etcd)
 
+![Supports amd64 Architecture][amd64-shield]
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports armv7 Architecture][armv7-shield]
 
@@ -54,6 +56,6 @@ SOFTWARE.
 [armhf-shield]: https://img.shields.io/badge/armhf-no-red.svg
 [armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
-[amd64-shield]: https://img.shields.io/badge/amd64-no-red.svg
+[amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [addon-cups]: https://github.com/alsotoes/hassio-infrastructure/tree/main/cups
 [addon-doc-cups]: https://github.com/alsotoes/hassio-infrastructure/blob/main/cups/README.md
