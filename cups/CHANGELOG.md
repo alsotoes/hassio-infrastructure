@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4
+
+- fixing avahi issues/8
+
 ## 1.3
 
 - Removing ulimit to fix issues/7, I don't have documentation about really needed
