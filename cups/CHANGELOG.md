@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3
+
+- Removing ulimit to fix issues/7, I don't have documentation about really needed
+
 ## 1.2
 
 - No changes on packages or configuration
