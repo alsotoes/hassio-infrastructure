@@ -5,7 +5,7 @@ set -e
 mkdir -p /data/oldshare
 
 mount -t cifs "//$OLD_SERVER/$OLD_SHARE" /data/oldshare \
-  -o username=$OLD_USER,password=$OLD_PASS,vers=1.0,sec=ntlm,nounix,noserverino
+  -o username="$OLD_USER",password="$OLD_PASS",vers=1.0,sec=ntlm,nounix,noserverino
 
 # Generate Samba config
 cat > /etc/samba/smb.conf <<EOF
