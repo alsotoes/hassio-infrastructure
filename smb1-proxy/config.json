@@ -1,8 +1,8 @@
 {
   "name": "SMB1 Proxy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "slug": "smb1_proxy",
-  "description": "Proxy old SMBv1 shares and re-export over SMB3 for Home Assistant",
+  "description": "Proxy old SMB1 shares and re-export over SMB3",
   "arch": ["amd64", "armv7", "armhf", "aarch64"],
   "startup": "services",
   "boot": "auto",
@@ -10,6 +10,8 @@
     "445/tcp": 445,
     "139/tcp": 139
   },
+  "host_network": true,
+  "privileged": ["NET_ADMIN", "SYS_RESOURCE", "DAC_OVERRIDE"],
   "options": {
     "OLD_SERVER": "192.168.1.50",
     "OLD_SHARE": "Share",

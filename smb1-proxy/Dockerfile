@@ -3,17 +3,19 @@ FROM debian:bullseye-slim
 
 # Install Samba server and client tools
 RUN apt-get update && \
-    apt-get install -y samba smbclient cifs-utils && \
-    rm -rf /var/lib/apt/lists/*
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        samba smbclient cifs-utils \
+        && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy add-on configuration & entrypoint
+# Copy entrypoint
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
-# Create Samba config directory
+# Create Samba config/data dirs
 RUN mkdir -p /config /data /share
 
 # Expose Samba ports
 EXPOSE 139 445
 
+# Run smbd in foreground (no capability set change)
 CMD ["/run.sh"]
