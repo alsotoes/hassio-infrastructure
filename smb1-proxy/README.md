@@ -100,9 +100,5 @@ If you can’t connect to the proxy share, verify firewall rules and ensure port
 
 ---
 
-👉 Do you also want me to add **examples for mounting the proxied share inside Home Assistant OS** (so HA can directly use it as `/media` or `/backup`)? That would make it really convenient.
-
----
-
 📜 License
 This add-on is provided as-is, with no warranty. Use at your own risk.
