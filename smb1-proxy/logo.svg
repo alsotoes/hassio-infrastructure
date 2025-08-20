@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Background -->
+  <rect width="128" height="128" rx="20" ry="20" fill="#1E88E5"></rect>
+
+  <!-- Old server (SMB1) -->
+  <rect x="20" y="35" width="36" height="28" rx="4" ry="4" fill="#f44336"></rect>
+  <text x="38" y="54" font-family="Arial" font-size="10" fill="white" text-anchor="middle">SMB1</text>
+
+  <!-- Arrow -->
+  <polygon points="62,49 82,39 82,45 108,45 108,53 82,53 82,59" fill="#ffffff"></polygon>
+
+  <!-- New server (SMB3) -->
+  <rect x="72" y="35" width="36" height="28" rx="4" ry="4" fill="#4CAF50"></rect>
+  <text x="90" y="54" font-family="Arial" font-size="10" fill="white" text-anchor="middle">SMB3</text>
+
+  <!-- Bottom label -->
+  <text x="64" y="110" font-family="Arial" font-size="12" fill="white" text-anchor="middle">
+    Proxy
+  </text>
+</svg>
