@@ -10,6 +10,8 @@
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 
+![smb1-proxy Logo](https://raw.githubusercontent.com/alsotoes/hassio-infrastructure/main/smb1-proxy/logo.svg)
+
 Some legacy devices (old NAS, printers, Windows XP machines, etc.) only support the **SMB1 (CIFS/NT1)** protocol, which modern Linux kernels and Home Assistant no longer support for security reasons.  
 
 This add-on acts as a **proxy**:
