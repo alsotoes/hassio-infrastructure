@@ -1,0 +1,25 @@
+{
+  "name": "SMB1 Proxy",
+  "version": "1.0.0",
+  "slug": "smb1_proxy",
+  "description": "Proxy old SMBv1 shares and re-export over SMB3 for Home Assistant",
+  "arch": ["amd64", "armv7", "armhf", "aarch64"],
+  "startup": "services",
+  "boot": "auto",
+  "ports": {
+    "445/tcp": 445,
+    "139/tcp": 139
+  },
+  "options": {
+    "OLD_SERVER": "192.168.1.50",
+    "OLD_SHARE": "Share",
+    "OLD_USER": "guest",
+    "OLD_PASS": ""
+  },
+  "schema": {
+    "OLD_SERVER": "str",
+    "OLD_SHARE": "str",
+    "OLD_USER": "str",
+    "OLD_PASS": "str"
+  }
+}
