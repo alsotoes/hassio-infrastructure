@@ -2,6 +2,8 @@
 set -eu
 mkdir -p /run/samba
 
+ulimit -c 0 || true
+
 is_alive() {
   _f="$1"
   if [ -f "$_f" ]; then

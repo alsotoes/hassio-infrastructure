@@ -12,8 +12,16 @@ REXPORT_NAME="$(bashio::config 'reexport_share_name')"
 ALLOW_NTLMV1="$(bashio::config 'allow_ntlmv1')"
 ALLOW_SMB1="$(bashio::config 'allow_smb1')"
 
-if bashio::config.has 'hosts_allow'; then HOSTS_ALLOW_JSON="$(bashio::config 'hosts_allow')"; else HOSTS_ALLOW_JSON='[]'; fi
-if bashio::config.has 'interfaces'; then INTERFACES_JSON="$(bashio::config 'interfaces')"; else INTERFACES_JSON='[]'; fi
+if bashio::config.has_value 'hosts_allow'; then
+  HOSTS_ALLOW_JSON="$(bashio::config 'hosts_allow')"
+else
+  HOSTS_ALLOW_JSON='[]'
+fi
+if bashio::config.has_value 'interfaces'; then
+  INTERFACES_JSON="$(bashio::config 'interfaces')"
+else
+  INTERFACES_JSON='[]'
+fi
 HOSTS_ALLOW="$(jq -r '.[]? // empty' <<<"${HOSTS_ALLOW_JSON}" | xargs || true)"
 INTERFACES="$(jq -r '.[]? // empty' <<<"${INTERFACES_JSON}" | xargs || true)"
 
@@ -36,16 +44,6 @@ cat > /etc/samba/smb.conf <<CONF
    $( [ "${ALLOW_NTLMV1}" = "true" ] && echo "ntlm auth = yes" || echo "ntlm auth = no" )
 CONF
 
-NETBIOS_NAME_OPT="$(bashio::config 'netbios_name' || true)"
-if [ -n "${NETBIOS_NAME_OPT:-}" ]; then
-  NETBIOS_NAME="${NETBIOS_NAME_OPT}"
-else
-  # Derive a unique default from container hostname (uppercase, <=15 chars)
-  HN="$(hostname | tr '[:lower:]' '[:upper:]')"
-  NETBIOS_NAME="SMB1GW-${HN}"
-  NETBIOS_NAME="${NETBIOS_NAME:0:15}"
-fi
-
 AUTH_FILE="/root/.smb/smbnetfs.auth"
 cat > "${AUTH_FILE}" <<EOF
 auth "${TC_HOST}" "${TC_SHARE}" "${TC_USER}" "${TC_PASS}" "${TC_DOMAIN}"
@@ -64,6 +62,7 @@ chmod 600 "${AUTH_FILE}"
   echo "   passdb backend = tdbsam"
   echo "   server min protocol = SMB2"
   echo "   server max protocol = SMB3"
+  echo "   panic action = /bin/true"
   if [ "${ALLOW_NTLMV1}" = "true" ]; then
     echo "   ntlm auth = yes"
   else
