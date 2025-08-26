@@ -1,4 +1,4 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=ghcr.io/home-assistant/aarch64-base-debian:bookworm
 FROM ${BUILD_FROM}
 
 # Set shell
@@ -6,6 +6,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        jq \
         sudo \
         locales \
         cups \
@@ -52,6 +53,12 @@ RUN set -eux; \
     rm -f /tmp/hp-plugin.exp
 
 COPY rootfs /
+RUN chmod 0755 /etc/cont-init.d/10-avahi \
+    /etc/cont-init.d/20-cups-service-name \
+    /etc/cont-init.d/30-cups-web \
+    /etc/services.d/dbus/run \
+    /etc/services.d/avahi/run \
+    /etc/services.d/cupsd/run
 
 # Add user and disable sudo password checking
 RUN useradd \
@@ -64,10 +71,6 @@ RUN useradd \
 && sed -i '/%sudo[[:space:]]/ s/ALL[[:space:]]*$/NOPASSWD:ALL/' /etc/sudoers
 
 EXPOSE 631
-
-RUN chmod a+x /run.sh
-
-CMD ["/run.sh"]
 
 # Build arguments
 ARG BUILD_DATE

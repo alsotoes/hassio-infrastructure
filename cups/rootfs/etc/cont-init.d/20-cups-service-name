@@ -1,5 +1,6 @@
-#!/usr/bin/with-contenv bash
+#!/usr/bin/with-contenv bashio
 set -euo pipefail
 NAME="$(bashio::config 'cups_service_name')"
 svc="/etc/avahi/services/cups.service"
+mkdir -p /etc/avahi/services
 sed -i "s|__CUPS_SERVICE_NAME__|${NAME}|g" "${svc}"

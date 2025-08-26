@@ -1,65 +1,47 @@
-#!/usr/bin/with-contenv bash
+#!/usr/bin/with-contenv bashio
 set -euo pipefail
-source /usr/lib/bashio/bashio
-
 ENABLE_WEB="$(bashio::config 'enable_web_admin')"
 REQUIRE_AUTH="$(bashio::config 'require_auth_on_admin')"
-
 ALLOW_LIST_JSON="$(bashio::config 'admin_allow_subnets')"
-ALLOW_LIST="$(echo "${ALLOW_LIST_JSON}" | jq -r '.[]' | xargs)"
-
+ALLOW_LIST="$(echo "${ALLOW_LIST_JSON}" | jq -r '.[]' | xargs || true)"
 mkdir -p /etc/cups
-
 if [ "${ENABLE_WEB}" != "true" ]; then
   bashio::log.info "Web Admin disabled by config"
   exit 0
 fi
-
 bashio::log.info "Enabling CUPS Web Admin and listening on 0.0.0.0:631"
-
 cat > /etc/cups/cupsd.conf <<CONF
 LogLevel warn
 PageLogFormat
 MaxLogSize 0
-
 Port 631
 Listen /run/cups/cups.sock
-
 Browsing On
 BrowseLocalProtocols dnssd
-
 WebInterface Yes
-
 DefaultAuthType Basic
-
 <Location />
   Order allow,deny
 CONF
-
 for net in ${ALLOW_LIST}; do
   echo "  Allow from ${net}" >> /etc/cups/cupsd.conf
 done
-
 cat >> /etc/cups/cupsd.conf <<CONF
 </Location>
-
 <Location /admin>
   Order allow,deny
 CONF
 for net in ${ALLOW_LIST}; do
   echo "  Allow from ${net}" >> /etc/cups/cupsd.conf
 done
-
 if [ "${REQUIRE_AUTH}" = "true" ]; then
   cat >> /etc/cups/cupsd.conf <<CONF
   AuthType Default
   Require valid-user
 CONF
 fi
-
 cat >> /etc/cups/cupsd.conf <<CONF
 </Location>
-
 <Location /admin/conf>
   AuthType Default
   Require user @SYSTEM
@@ -71,6 +53,5 @@ done
 cat >> /etc/cups/cupsd.conf <<CONF
 </Location>
 CONF
-
 bashio::log.info "cupsd.conf generated:"
 cat /etc/cups/cupsd.conf

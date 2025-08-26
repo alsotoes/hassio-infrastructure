@@ -1,20 +1,24 @@
 # Changelog
 
+## 1.4.3
+
+- Fixing bashio image errors.
+
 ## 1.4.2
 
 - Adding CUPS Web Admin UI explicitly.
 
 ## 1.4.1
 
-- fixing avahi issues/8
+- Fixing avahi issues/8.
 
 ## 1.4.0
 
-- fixing avahi issues/8
+- Fixing avahi issues/8.
 
 ## 1.3.0
 
-- Removing ulimit to fix issues/7, I don't have documentation about really needed
+- Removing ulimit to fix issues/7, I don't have documentation about really needed.
 
 ## 1.2.0
 
