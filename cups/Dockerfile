@@ -4,8 +4,8 @@ FROM ${BUILD_FROM}
 # Set shell
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         sudo \
         locales \
         cups \
@@ -38,14 +38,18 @@ RUN wget -q https://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_2_
     && apt-get install -y suld-driver2-1.00.39hp && apt-get clean -y \
     && rm -f suldr-keyring_2_all.deb && rm -rf /var/lib/apt/lists/*
 
-RUN expect << EOF \
-    spawn hp-plugin -i \
-    expect "Enter option (d=download*, p=specify path, q=quit) ?" \
-    send "d\r" \
-    expect "Do you accept the license terms for the plug-in (y=yes*, n=no, q=quit) ?" \
-    send "y\r" \
-    expect eof \
-    EOF
+# run hp-plugin via an expect script without heredoc
+RUN set -eux; \
+    printf '%s\n' \
+      'spawn hp-plugin -i' \
+      'expect "Enter option (d=download*, p=specify path, q=quit) ?"' \
+      'send "d\r"' \
+      'expect "Do you accept the license terms for the plug-in (y=yes*, n=no, q=quit) ?"' \
+      'send "y\r"' \
+      'expect eof' \
+    > /tmp/hp-plugin.exp; \
+    expect /tmp/hp-plugin.exp; \
+    rm -f /tmp/hp-plugin.exp
 
 COPY rootfs /
 
