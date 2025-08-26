@@ -1,3 +1,4 @@
+---
 name: SMB1 Proxy
 slug: smb1_proxy
 description: "Serve a local path over SMB with optional SMB1/NT1 support (no kernel mounts)."
