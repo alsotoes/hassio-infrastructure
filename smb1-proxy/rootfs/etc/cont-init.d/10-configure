@@ -1,38 +1,33 @@
 #!/usr/bin/with-contenv bashio
 set -euo pipefail
 
-# Read mandatory config
 TC_HOST="$(bashio::config 'tc_host')"
 TC_SHARE="$(bashio::config 'tc_share')"
 TC_USER="$(bashio::config 'tc_username')"
 TC_PASS="$(bashio::config 'tc_password')"
 
-# Optionals with sane defaults
 TC_DOMAIN="$(bashio::config 'tc_domain' || echo '')"
 MOUNT_POINT="$(bashio::config 'mount_point')"
 REXPORT_NAME="$(bashio::config 'reexport_share_name')"
 ALLOW_NTLMV1="$(bashio::config 'allow_ntlmv1')"
 ALLOW_SMB1="$(bashio::config 'allow_smb1')"
 
-# Arrays: guard against missing/null
-if bashio::config.has 'hosts_allow'; then
-  HOSTS_ALLOW_JSON="$(bashio::config 'hosts_allow')"
-else
-  HOSTS_ALLOW_JSON='[]'
-fi
-if bashio::config.has 'interfaces'; then
-  INTERFACES_JSON="$(bashio::config 'interfaces')"
-else
-  INTERFACES_JSON='[]'
-fi
-
-# Convert arrays safely; use .[]? to tolerate []
+if bashio::config.has 'hosts_allow'; then HOSTS_ALLOW_JSON="$(bashio::config 'hosts_allow')"; else HOSTS_ALLOW_JSON='[]'; fi
+if bashio::config.has 'interfaces'; then INTERFACES_JSON="$(bashio::config 'interfaces')"; else INTERFACES_JSON='[]'; fi
 HOSTS_ALLOW="$(jq -r '.[]? // empty' <<<"${HOSTS_ALLOW_JSON}" | xargs || true)"
 INTERFACES="$(jq -r '.[]? // empty' <<<"${INTERFACES_JSON}" | xargs || true)"
 
+NETBIOS_NAME_OPT="$(bashio::config 'netbios_name' || true)"
+if [ -n "${NETBIOS_NAME_OPT:-}" ]; then
+  NETBIOS_NAME="${NETBIOS_NAME_OPT}"
+else
+  HN="$(hostname | tr '[:lower:]' '[:upper:]')"
+  NETBIOS_NAME="SMB1GW-${HN}"
+  NETBIOS_NAME="${NETBIOS_NAME:0:15}"
+fi
+
 mkdir -p "${MOUNT_POINT}" /data /etc/samba /root/.smb /run/samba /share
 
-# Samba client settings (force SMB1/NT1 if required)
 cat > /etc/samba/smb.conf <<CONF
 [global]
    client min protocol = $( [ "${ALLOW_SMB1}" = "true" ] && echo NT1 || echo SMB2 )
@@ -41,21 +36,25 @@ cat > /etc/samba/smb.conf <<CONF
    $( [ "${ALLOW_NTLMV1}" = "true" ] && echo "ntlm auth = yes" || echo "ntlm auth = no" )
 CONF
 
-# Credentials for smbnetfs
+NETBIOS_NAME_OPT="$(bashio::config 'netbios_name' || true)"
+if [ -n "${NETBIOS_NAME_OPT:-}" ]; then
+  NETBIOS_NAME="${NETBIOS_NAME_OPT}"
+else
+  # Derive a unique default from container hostname (uppercase, <=15 chars)
+  HN="$(hostname | tr '[:lower:]' '[:upper:]')"
+  NETBIOS_NAME="SMB1GW-${HN}"
+  NETBIOS_NAME="${NETBIOS_NAME:0:15}"
+fi
+
 AUTH_FILE="/root/.smb/smbnetfs.auth"
 cat > "${AUTH_FILE}" <<EOF
 auth "${TC_HOST}" "${TC_SHARE}" "${TC_USER}" "${TC_PASS}" "${TC_DOMAIN}"
 EOF
 chmod 600 "${AUTH_FILE}"
 
-# Minimal smbnetfs config
-cat > /root/.smb/smbnetfs.conf <<'EOF'
-# smbnetfs minimal config; client protocol forced by /etc/samba/smb.conf
-EOF
-
-# Samba server (re-export) config
 {
   echo "[global]"
+  echo "   netbios name = ${NETBIOS_NAME}"
   echo "   server role = standalone server"
   echo "   server string = SMB1 TimeCapsule Gateway"
   echo "   workgroup = WORKGROUP"
@@ -89,16 +88,14 @@ EOF
   echo "   directory mask = 0755"
 } > /etc/samba/smb-server.conf
 
-# Ensure a system user exists for Samba (Debian-compatible: useradd)
 if ! id -u "${TC_USER}" >/dev/null 2>&1; then
   useradd -M -s /usr/sbin/nologin "${TC_USER}" || true
 fi
 
-# Create/Update SMB password entry for that user
 if pdbedit -L | grep -q "^${TC_USER}:"; then
   (echo "${TC_PASS}"; echo "${TC_PASS}") | smbpasswd -s "${TC_USER}" || true
 else
   (echo "${TC_PASS}"; echo "${TC_PASS}") | smbpasswd -a -s "${TC_USER}"
 fi
 
-bashio::log.info "Configuration rendered successfully."
+bashio::log.info "Configuration rendered with netbios name '${NETBIOS_NAME}'."

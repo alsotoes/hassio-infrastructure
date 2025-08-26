@@ -1,0 +1,30 @@
+#!/usr/bin/with-contenv bashio
+set -euo pipefail
+
+ADVERTISE_MDNS="$(bashio::config 'advertise_mdns' || echo 'false')"
+MDNS_HOSTNAME="$(bashio::config 'mdns_hostname' || echo 'smb1-gw')"
+
+if [ "${ADVERTISE_MDNS}" != "true" ]; then
+  mkdir -p /etc/services.d/avahi
+  : > /etc/services.d/avahi/down
+  bashio::log.info "mDNS advertising disabled; Avahi service will not start."
+  exit 0
+fi
+
+mkdir -p /etc/avahi
+cat > /etc/avahi/avahi-daemon.conf <<EOF
+[server]
+host-name=${MDNS_HOSTNAME}
+domain-name=local
+use-ipv4=yes
+use-ipv6=no
+
+[wide-area]
+enable-wide-area=no
+
+[publish]
+publish-hinfo=no
+publish-workstation=no
+EOF
+
+bashio::log.info "mDNS advertising enabled with hostname '${MDNS_HOSTNAME}'."

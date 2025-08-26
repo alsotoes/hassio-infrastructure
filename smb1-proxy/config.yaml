@@ -37,6 +37,9 @@ schema:
     - str
   expose_in_share: bool
   share_link_name: str
+  advertise_mdns: bool
+  mdns_hostname: str
+  netbios_name: str
 
 options:
   tc_host: "timecapsule.local"
@@ -56,3 +59,6 @@ options:
   interfaces: []
   expose_in_share: true
   share_link_name: "timecapsule"
+  advertise_mdns: false
+  mdns_hostname: "smb1-gw"
+  netbios_name: "SMB1GW"
