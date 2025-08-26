@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0
+## 0.2.0
 
 - Changing the entire structure for a more modern hassio add-on looklike
 
