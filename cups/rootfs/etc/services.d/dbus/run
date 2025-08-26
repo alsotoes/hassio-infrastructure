@@ -1,18 +1,39 @@
 #!/usr/bin/with-contenv sh
 set -eu
+
 mkdir -p /run/dbus
 
+# Helper: check if system bus is healthy
+is_bus_healthy() {
+  # Socket exists and dbus-send works -> healthy
+  if [ -S /run/dbus/system_bus_socket ]; then
+    if command -v dbus-send >/dev/null 2>&1; then
+      if dbus-send --system --dest=org.freedesktop.DBus --type=method_call           / org.freedesktop.DBus.ListNames >/dev/null 2>&1; then
+        return 0
+      fi
+    else
+      # Fallback: if PID file exists and process lives, assume healthy
+      if [ -f /run/dbus/pid ] && kill -0 "$(cat /run/dbus/pid)" 2>/dev/null; then
+        return 0
+      fi
+    fi
+  fi
+  return 1
+}
+
+# If DBus is healthy, don't start another instance (avoid "already running" spam)
+if is_bus_healthy; then
+  echo "[info] System D-Bus already running; not starting a second instance."
+  exec tail -f /dev/null
+fi
+
+# Clean stale PID file if present
 if [ -f /run/dbus/pid ]; then
-  PID="$(cat /run/dbus/pid || true)"
-  if [ -n "${PID}" ] && kill -0 "${PID}" 2>/dev/null; then
-    echo "[info] D-Bus already running on PID ${PID}; not starting another instance."
-    # Keep the service alive in foreground; Avahi/CUPS can talk to existing bus.
-    exec tail -f /dev/null
-  else
-    echo "[warn] Stale D-Bus PID file found; removing."
+  if ! kill -0 "$(cat /run/dbus/pid)" 2>/dev/null; then
+    echo "[warn] Stale D-Bus pid file found; removing."
     rm -f /run/dbus/pid
   fi
 fi
 
-# Start a fresh system bus in foreground; avoid pidfile conflicts.
+# Start fresh bus in foreground; no pidfile to avoid future clashes
 exec /usr/bin/dbus-daemon --system --nofork --nopidfile
