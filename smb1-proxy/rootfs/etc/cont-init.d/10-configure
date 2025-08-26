@@ -1,107 +1,101 @@
-#!/usr/bin/with-contenv bash
-# Configure Samba based on add-on options before services start
+#!/usr/bin/with-contenv bashio
+# Configure Samba at container init using Home Assistant bashio
 set -euo pipefail
 
-# shellcheck disable=SC1091
-source /usr/lib/bashio/bashio
+# Read options
+WORKGROUP="$(bashio::config 'workgroup')"
+SHARE_NAME="$(bashio::config 'share_name')"
+EXPORT_PATH="$(bashio::config 'export_path')"
+USERNAME="$(bashio::config 'username')"
+PASSWORD="$(bashio::config 'password')"
+READ_ONLY="$(bashio::config 'read_only')"
+ALLOW_SMB1="$(bashio::config 'allow_smb1')"
+ALLOW_NTLMV1="$(bashio::config 'allow_ntlmv1')"
+GUEST_OK="$(bashio::config 'guest_ok')"
 
-WORKGROUP=$(bashio::config 'workgroup')
-SHARE_NAME=$(bashio::config 'share_name')
-EXPORT_PATH=$(bashio::config 'export_path')
-USERNAME=$(bashio::config 'username')
-PASSWORD=$(bashio::config 'password')
-READ_ONLY=$(bashio::config 'read_only')
-ALLOW_SMB1=$(bashio::config 'allow_smb1')
-ALLOW_NTLMV1=$(bashio::config 'allow_ntlmv1')
-GUEST_OK=$(bashio::config 'guest_ok')
-HOSTS_ALLOW=$(bashio::config 'hosts_allow')
-INTERFACES=$(bashio::config 'interfaces')
+# Arrays (JSON) to space-separated lists
+HOSTS_ALLOW_JSON="$(bashio::config 'hosts_allow')"
+INTERFACES_JSON="$(bashio::config 'interfaces')"
 
-mkdir -p "${EXPORT_PATH}"
+HOSTS_ALLOW="$(echo "${HOSTS_ALLOW_JSON}" | jq -r '.[]' | xargs || true)"
+INTERFACES="$(echo "${INTERFACES_JSON}" | jq -r '.[]' | xargs || true)"
+
+mkdir -p "${EXPORT_PATH}" /etc/samba
 
 # Build smb.conf
-cat > /etc/samba/smb.conf <<'CONF'
-[global]
-   server role = standalone server
-   server string = SMB1 Proxy
-   workgroup = ${WORKGROUP}
-   # Logging to stdout handled by smbd --log-stdout
-   log file = /dev/stdout
-   max log size = 0
-   load printers = no
-   printing = bsd
-   disable spoolss = yes
-   dns proxy = no
+{
+  echo "[global]"
+  echo "   server role = standalone server"
+  echo "   server string = SMB1 Proxy"
+  echo "   workgroup = ${WORKGROUP}"
+  echo "   log file = /dev/stdout"
+  echo "   max log size = 0"
+  echo "   load printers = no"
+  echo "   disable spoolss = yes"
+  echo "   dns proxy = no"
 
-   # Protocol minima/maxima (set dynamically)
-   # client/server protocol options injected below
+  # Protocol min/max
+  if [ "${ALLOW_SMB1}" = "true" ]; then
+    echo "   server min protocol = NT1"
+    echo "   server max protocol = SMB3"
+  else
+    echo "   server min protocol = SMB2"
+    echo "   server max protocol = SMB3"
+  fi
 
-   # Security/auth
-   map to guest = Bad User
-   obey pam restrictions = no
-   pam password change = no
-   passdb backend = tdbsam
-   unix password sync = no
+  # Auth
+  if [ "${ALLOW_NTLMV1}" = "true" ]; then
+    echo "   ntlm auth = yes"
+  else
+    echo "   ntlm auth = no"
+  fi
 
-   # Networking
-   # Optional bind interfaces only injected below
-   # Name resolution
-   wins support = yes
-CONF
+  echo "   map to guest = Bad User"
+  echo "   passdb backend = tdbsam"
 
-# Inject protocol/security options
-if [ "${ALLOW_SMB1}" = "true" ]; then
-  echo "   server min protocol = NT1" >> /etc/samba/smb.conf
-  echo "   server max protocol = SMB3" >> /etc/samba/smb.conf
-else
-  echo "   server min protocol = SMB2" >> /etc/samba/smb.conf
-  echo "   server max protocol = SMB3" >> /etc/samba/smb.conf
-fi
+  # Networking
+  if [ -n "${INTERFACES}" ]; then
+    echo "   interfaces = ${INTERFACES}"
+    echo "   bind interfaces only = yes"
+  fi
+  if [ -n "${HOSTS_ALLOW}" ]; then
+    echo "   hosts allow = ${HOSTS_ALLOW}"
+  fi
 
-if [ "${ALLOW_NTLMV1}" = "true" ]; then
-  echo "   ntlm auth = yes" >> /etc/samba/smb.conf
-else
-  echo "   ntlm auth = no" >> /etc/samba/smb.conf
-fi
+  echo ""
+  echo "[${SHARE_NAME}]"
+  echo "   path = ${EXPORT_PATH}"
+  echo "   browseable = yes"
+  if [ "${READ_ONLY}" = "true" ]; then
+    echo "   read only = yes"
+    echo "   writeable = no"
+  else
+    echo "   read only = no"
+    echo "   writeable = yes"
+  fi
+  if [ "${GUEST_OK}" = "true" ]; then
+    echo "   guest ok = yes"
+  else
+    echo "   guest ok = no"
+  fi
+  echo "   force user = root"
+  echo "   create mask = 0644"
+  echo "   directory mask = 0755"
+} > /etc/samba/smb.conf
 
-# Restrict hosts
-if [ -n "${HOSTS_ALLOW}" ]; then
-  # Convert JSON array to space-separated list
-  ALLOW_LIST=$(echo "${HOSTS_ALLOW}" | jq -r '.[]' | xargs)
-  echo "   hosts allow = ${ALLOW_LIST}" >> /etc/samba/smb.conf
-fi
+bashio::log.info "Generated /etc/samba/smb.conf:"
+cat /etc/samba/smb.conf
 
-# Bind specific interfaces if provided
-if [ "$(echo "${INTERFACES}" | jq 'length')" != "0" ]; then
-  IFACES=$(echo "${INTERFACES}" | jq -r '.[]' | xargs)
-  echo "   interfaces = ${IFACES}" >> /etc/samba/smb.conf
-  echo "   bind interfaces only = yes" >> /etc/samba/smb.conf
-fi
-
-# Share block
-cat >> /etc/samba/smb.conf <<CONF
-[${SHARE_NAME}]
-   path = ${EXPORT_PATH}
-   browseable = yes
-   writeable = $( [ "${READ_ONLY}" = "true" ] && echo "no" || echo "yes" )
-   read only = $( [ "${READ_ONLY}" = "true" ] && echo "yes" || echo "no" )
-   guest ok = $( [ "${GUEST_OK}" = "true" ] && echo "yes" || echo "no" )
-   force user = root
-   create mask = 0644
-   directory mask = 0755
-CONF
-
-# Create user if not guest-only
+# Create/Update SMB user if not guest
 if [ "${GUEST_OK}" != "true" ]; then
   if pdbedit -L | grep -q "^${USERNAME}:"; then
     bashio::log.info "Updating SMB password for user ${USERNAME}"
     (echo "${PASSWORD}"; echo "${PASSWORD}") | smbpasswd -s "${USERNAME}" || true
   else
     bashio::log.info "Creating SMB user ${USERNAME}"
-    adduser -D -H -s /sbin/nologin "${USERNAME}" || true
+    adduser -D -H -s /sbin/nologin "${USERNAME}" 2>/dev/null || adduser --disabled-password --gecos "" "${USERNAME}" || true
     (echo "${PASSWORD}"; echo "${PASSWORD}") | smbpasswd -a -s "${USERNAME}"
   fi
 fi
 
-bashio::log.info "smb.conf generated"
-cat /etc/samba/smb.conf
+bashio::log.info "smb1-proxy configuration complete."
