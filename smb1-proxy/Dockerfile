@@ -1,21 +1,15 @@
-# Start from a minimal base
-FROM debian:bullseye-slim
+# Multi-arch Home Assistant add-on base (Alpine + s6-overlay v3)
+ARG BUILD_FROM
+FROM ${BUILD_FROM}
 
-# Install Samba server and client tools
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        samba smbclient cifs-utils \
-        && apt-get clean && rm -rf /var/lib/apt/lists/*
+# hadolint ignore=DL3018
+RUN set -eux;     apk add --no-cache samba-common-tools samba-server samba-client bash jq coreutils;     mkdir -p /run/samba /etc/samba /data
 
-# Copy entrypoint
-COPY run.sh /run.sh
-RUN chmod +x /run.sh
+# Copy rootfs (s6 services & scripts)
+COPY rootfs /
 
-# Create Samba config/data dirs
-RUN mkdir -p /config /data /share
+# Ensure executables
+RUN chmod +x /etc/services.d/smbd/run /etc/cont-init.d/10-configure
 
-# Expose Samba ports
-EXPOSE 139 445
-
-# Run smbd in foreground (no capability set change)
-CMD ["/run.sh"]
+# Expose (host_network is enabled, but keep for clarity)
+EXPOSE 137/udp 138/udp 139/tcp 445/tcp

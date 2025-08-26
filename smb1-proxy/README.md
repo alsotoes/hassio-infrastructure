@@ -1,104 +1,57 @@
-# Home Assistant Community Add-on: SMB1 Proxy
+# Home Assistant Add-on: SMB1 Proxy (No kernel mounts)
 
-![Supports amd64 Architecture][amd64-shield]
-![Supports aarch64 Architecture][aarch64-shield]
-![Supports arm64 Architecture][arm64-shield]
+This add-on provides a **Samba server** that accepts **legacy SMB1/NT1** clients and
+re-exports a local directory from your Home Assistant host. It **does not** attempt to
+mount remote CIFS/SMB shares from inside the container, so it avoids the
+“Unable to apply new capability set.” error caused by missing kernel capabilities.
 
-[armhf-shield]: https://img.shields.io/badge/armhf-no-red.svg
-[armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg
-[arm64-shield]: https://img.shields.io/badge/arm64-yes-green.svg
-[aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
-[amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
+## What this add-on does
+- Serves a **single** share to your LAN using Samba (SMB/CIFS).
+- Can **allow SMB1/NT1** and weaker NTLMv1 auth for very old clients (Windows XP, old TVs, embedded NAS). Controlled via options.
+- Stores files in a host-mapped directory (default: `/share/smb1-proxy`) so data persists and is visible to other add-ons/host.
 
-![smb1-proxy Logo](https://raw.githubusercontent.com/alsotoes/hassio-infrastructure/main/smb1-proxy/logo.svg)
+## What this add-on does NOT do
+- It **does not mount** a remote SMB share from inside the container.
+  If you need to proxy a remote share, mount it on the *host* (or another box) and
+  point the `export_path` to that mount via the `/share` mapping.
 
-Some legacy devices (old NAS, printers, Windows XP machines, etc.) only support the **SMB1 (CIFS/NT1)** protocol, which modern Linux kernels and Home Assistant no longer support for security reasons.  
+## Requirements
+- Home Assistant **OS** + **Supervisor** (you have this).
+- Architecture: works on all HA arches (`aarch64`, `amd64`, `armv7`, `armhf`, `i386`).
+- Uses **host networking** to bind SMB ports (137/138/139/445).
 
-This add-on acts as a **proxy**:
-- Connects to the legacy SMB1 share.
-- Re-exports it as a modern **SMB2/SMB3 share** that Home Assistant and other devices can mount safely.
+## Installation
+1. Copy this folder into your local add-ons repo on the host, e.g.:
+   `/usr/share/hassio/addons/local/ha-addon-smb1-proxy`
+2. In Home Assistant: *Settings → Add-ons → Add-on Store* → refresh → open **SMB1 Proxy** → **Install**.
+3. Configure options (username/password, share name, `export_path`, and SMB1 toggles).
+4. Start the add-on; check the **Logs**.
+5. From a client, connect to `\<HA-IP>\<share_name>` (Windows) or `smb://<HA-IP>/<share_name>` (macOS/Linux).
 
-⚠️ **Important:** SMB1 is insecure. Only use this add-on on trusted networks, and consider migrating data off legacy devices whenever possible.
-
----
-
-## 🚀 Installation
-
-1. Copy this add-on into your Home Assistant `addons/` folder: /config/addons/smb1-proxy/
-
-The folder should contain:
-- `Dockerfile`
-- `config.json`
-- `run.sh`
-- `README.md` (this file)
-
-2. Go to **Home Assistant → Settings → Add-ons → Add-on Store**.
-3. Click the **⋮ menu → Repositories → Local add-ons**.
-4. Find and install **SMB1 Proxy**.
-
----
-
-## ⚙️ Configuration
-
-The add-on uses environment variables to define the old SMB1 server details.
-
-Example configuration in Home Assistant:
-
+## Options (with sensible defaults)
 ```yaml
-OLD_SERVER: "192.168.1.50"
-OLD_SHARE: "LegacyShare"
-OLD_USER: "guest"
-OLD_PASS: ""
+workgroup: "WORKGROUP"
+share_name: "smb1"
+export_path: "/share/smb1-proxy"
+username: "smb1"
+password: "changeme"
+read_only: false
+allow_smb1: true
+allow_ntlmv1: true
+guest_ok: false
+hosts_allow: ["192.168.0.0/16", "10.0.0.0/8", "172.16.0.0/12"]
+interfaces: []  # e.g. ["eth0"]
 ```
 
-| Option       | Description                           | Default  |
-| ------------ | ------------------------------------- | -------- |
-| `OLD_SERVER` | IP or hostname of the old SMB1 server | required |
-| `OLD_SHARE`  | Share name on the old server          | required |
-| `OLD_USER`   | Username for the old server           | `guest`  |
-| `OLD_PASS`   | Password for the old server           | empty    |
+- **allow_smb1**: If `true`, sets `server min protocol = NT1` to allow SMB1. If `false`, min protocol is SMB2.
+- **allow_ntlmv1**: If `true`, enables `ntlm auth = yes` for very old clients. Leaving it `false` is more secure.
+- **guest_ok**: If `true`, allows guest access for the share (no password). Not recommended.
+- **hosts_allow**: Restrict LANs that may connect.
+- **interfaces**: Force Samba to bind only to specific interfaces (optional).
 
+## Security
+SMB1 and NTLMv1 are insecure and should be used **only** on trusted LANs for legacy devices.
+Use `hosts_allow` to restrict access and consider placing legacy devices on an isolated VLAN.
 
-📂 Accessing the Proxied Share
-
-Once the add-on is running:
-
-The legacy share is mounted inside the container.
-
-The container runs a Samba server that re-exports it as SMB3.
-
-You can access it from other devices (including Home Assistant host) at:
-
-\\<home-assistant-host>\proxied
-
-
-Example from Linux:
-```bash
-sudo mount -t cifs //homeassistant.local/proxied /mnt/proxied \
-  -o username=guest,password=,vers=3.0
-```
-
-🔒 Security Notes
-
-SMB1 is deprecated and insecure (exploited by malware like WannaCry).
-
-Keep the add-on and device on a trusted local network only.
-
-Consider migrating data away from SMB1 devices as a long-term solution.
-
-🛠️ Troubleshooting
-
-If the share does not mount, check logs with:
-
-```bash
-docker logs addon_smb1_proxy
-```
-
-Add sec=ntlm or sec=lanman in run.sh if your device requires older authentication.
-
-If you can’t connect to the proxy share, verify firewall rules and ensure ports 139 and 445 are open.
-
----
-
-📜 License
-This add-on is provided as-is, with no warranty. Use at your own risk.
+## Changelog
+- 0.2.0: Re-architected to avoid kernel CIFS mounts; no special capabilities needed; compatible with HA Core 2025.8.x.

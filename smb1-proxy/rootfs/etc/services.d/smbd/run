@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bash
+# s6 service: start nmbd (for NetBIOS discovery) and smbd
+set -euo pipefail
+
+# Start nmbd in background for legacy discovery
+nmbd --foreground --no-process-group &
+
+# Start smbd in foreground
+exec smbd --foreground --no-process-group --log-stdout

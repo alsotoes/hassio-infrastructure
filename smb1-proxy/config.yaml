@@ -1,0 +1,51 @@
+name: SMB1 Proxy
+slug: smb1_proxy
+description: "Serve a local path over SMB with optional SMB1/NT1 support (no kernel mounts)."
+version: "0.2.0"
+url: "https://github.com/alsotoes/hassio-infrastructure/tree/main/smb1-proxy"
+init: false
+startup: services
+arch:
+  - aarch64
+  - amd64
+  - armv7
+  - armhf
+  - i386
+# Use host networking for SMB ports/broadcasts
+host_network: true
+# AppArmor enabled (default). No special privileges required.
+apparmor: true
+# Map /share and a private addon config dir for persistence
+map:
+  - share:rw
+  - addon_config:rw
+# Schema for UI
+schema:
+  workgroup: str
+  share_name: str
+  export_path: str
+  username: str
+  password: str
+  read_only: bool
+  allow_smb1: bool
+  allow_ntlmv1: bool
+  guest_ok: bool
+  hosts_allow:
+    - str
+  interfaces?:
+    - str
+options:
+  workgroup: "WORKGROUP"
+  share_name: "smb1"
+  export_path: "/share/smb1-proxy"
+  username: "smb1"
+  password: "changeme"
+  read_only: false
+  allow_smb1: true
+  allow_ntlmv1: true
+  guest_ok: false
+  hosts_allow:
+    - "192.168.0.0/16"
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+  interfaces: []
