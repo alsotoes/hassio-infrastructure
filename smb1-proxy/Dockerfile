@@ -1,15 +1,11 @@
-# Multi-arch Home Assistant add-on base (Alpine + s6-overlay v3)
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
+ENV DEBIAN_FRONTEND=noninteractive
 
-# hadolint ignore=DL3018
-RUN set -eux;     apk add --no-cache samba-common-tools samba-server samba-client bash jq coreutils;     mkdir -p /run/samba /etc/samba /data
+RUN apt-get update  && apt-get install -y --no-install-recommends       samba smbclient cifs-utils smbnetfs fuse3 avahi-daemon dbus jq bash ca-certificates  && rm -rf /var/lib/apt/lists/*
 
-# Copy rootfs (s6 services & scripts)
 COPY rootfs /
 
-# Ensure executables
-RUN chmod +x /etc/services.d/smbd/run /etc/cont-init.d/10-configure
+RUN chmod 0755   /etc/cont-init.d/10-configure   /etc/services.d/dbus/run   /etc/services.d/avahi/run   /etc/services.d/mounter/run   /etc/services.d/smbd/run
 
-# Expose (host_network is enabled, but keep for clarity)
-EXPOSE 137/udp 138/udp 139/tcp 445/tcp
+EXPOSE 137/udp 138/udp 139/tcp 445/tcp 631/tcp

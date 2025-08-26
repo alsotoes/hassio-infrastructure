@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+- Moving to fuse to avoid kernel changes
+
 ## 1.2.0
 
 - Changing the entire structure for a more modern hassio add-on looklike

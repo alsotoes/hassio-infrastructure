@@ -1,57 +1,85 @@
-# Home Assistant Add-on: SMB1 Proxy (No kernel mounts)
+# smb1-proxy Add-on for Home Assistant
 
-This add-on provides a **Samba server** that accepts **legacy SMB1/NT1** clients and
-re-exports a local directory from your Home Assistant host. It **does not** attempt to
-mount remote CIFS/SMB shares from inside the container, so it avoids the
-“Unable to apply new capability set.” error caused by missing kernel capabilities.
+This Home Assistant add-on mounts an **old Apple Time Capsule (or any SMB1/NT1-only share)** and re-exports it over **modern SMB2/3** so other devices on your network can access it safely.
+It can also expose the mounted data inside Home Assistant’s `/share` folder for use by other add-ons.
 
-## What this add-on does
-- Serves a **single** share to your LAN using Samba (SMB/CIFS).
-- Can **allow SMB1/NT1** and weaker NTLMv1 auth for very old clients (Windows XP, old TVs, embedded NAS). Controlled via options.
-- Stores files in a host-mapped directory (default: `/share/smb1-proxy`) so data persists and is visible to other add-ons/host.
+---
 
-## What this add-on does NOT do
-- It **does not mount** a remote SMB share from inside the container.
-  If you need to proxy a remote share, mount it on the *host* (or another box) and
-  point the `export_path` to that mount via the `/share` mapping.
+## Features
 
-## Requirements
-- Home Assistant **OS** + **Supervisor** (you have this).
-- Architecture: works on all HA arches (`aarch64`, `amd64`, `armv7`, `armhf`, `i386`).
-- Uses **host networking** to bind SMB ports (137/138/139/445).
+- Connects to legacy SMB1/NT1 servers (e.g. Apple Time Capsule).
+- Supports both **kernel CIFS (vers=1.0)** and **FUSE smbnetfs** mounting.
+- Re-exports the mounted path via **Samba SMB2/3** for modern clients.
+- Optionally exposes the mounted share at `/share/<name>` for local add-ons.
+- Supports legacy **NTLMv1 authentication** if required.
+- Avahi + D-Bus included for mDNS/NetBIOS discovery.
+- Configurable access controls (`hosts_allow`, `interfaces`).
+
+---
 
 ## Installation
-1. Copy this folder into your local add-ons repo on the host, e.g.:
-   `/usr/share/hassio/addons/local/ha-addon-smb1-proxy`
-2. In Home Assistant: *Settings → Add-ons → Add-on Store* → refresh → open **SMB1 Proxy** → **Install**.
-3. Configure options (username/password, share name, `export_path`, and SMB1 toggles).
-4. Start the add-on; check the **Logs**.
-5. From a client, connect to `\<HA-IP>\<share_name>` (Windows) or `smb://<HA-IP>/<share_name>` (macOS/Linux).
 
-## Options (with sensible defaults)
+   - Go to **Settings → Add-ons → Add-on Store**.
+   - Click **⋮ → Reload**.
+   - Find **smb1-proxy**, click **Install**.
+
+---
+
+## Configuration
+
+Example configuration:
+
 ```yaml
-workgroup: "WORKGROUP"
-share_name: "smb1"
-export_path: "/share/smb1-proxy"
-username: "smb1"
-password: "changeme"
-read_only: false
-allow_smb1: true
-allow_ntlmv1: true
-guest_ok: false
-hosts_allow: ["192.168.0.0/16", "10.0.0.0/8", "172.16.0.0/12"]
-interfaces: []  # e.g. ["eth0"]
+tc_host: "timecapsule.local"       # Hostname or IP of your Time Capsule
+tc_share: "Data"                   # Share name (default on TC is "Data")
+tc_username: "admin"
+tc_password: "your-password"
+tc_domain: ""                      # Leave empty unless your device requires it
+mount_point: "/data/timecapsule"   # Where to mount inside the add-on
+use_kernel_cifs: false             # Try kernel CIFS first (requires CIFS support in HA OS)
+reexport_share_name: "timecapsule" # Name of the re-exported Samba share
+allow_ntlmv1: true                 # Enable if authentication fails
+allow_smb1: true                   # Force SMB1 client protocol
+hosts_allow:
+  - "192.168.0.0/16"
+interfaces: []
+expose_in_share: true              # Expose the mount inside HA's /share
+share_link_name: "timecapsule"     # Path: /share/timecapsule
 ```
 
-- **allow_smb1**: If `true`, sets `server min protocol = NT1` to allow SMB1. If `false`, min protocol is SMB2.
-- **allow_ntlmv1**: If `true`, enables `ntlm auth = yes` for very old clients. Leaving it `false` is more secure.
-- **guest_ok**: If `true`, allows guest access for the share (no password). Not recommended.
-- **hosts_allow**: Restrict LANs that may connect.
-- **interfaces**: Force Samba to bind only to specific interfaces (optional).
+---
 
-## Security
-SMB1 and NTLMv1 are insecure and should be used **only** on trusted LANs for legacy devices.
-Use `hosts_allow` to restrict access and consider placing legacy devices on an isolated VLAN.
+## Usage
 
-## Changelog
-- 0.2.0: Re-architected to avoid kernel CIFS mounts; no special capabilities needed; compatible with HA Core 2025.8.x.
+- **Network access (SMB2/3):**
+  - Windows: `\\<HA-IP>\timecapsule`
+  - macOS/Linux: `smb://<HA-IP>/timecapsule`
+
+- **Local access inside HA (if enabled):**
+  - `/share/timecapsule`
+
+---
+
+## Troubleshooting
+
+- If you see `Kernel CIFS mount failed`, set `use_kernel_cifs: false` and rely on FUSE.
+- If `smbnetfs` cannot locate your share:
+  - Use the Time Capsule’s IP instead of hostname.
+  - Try uppercase hostnames (NetBIOS).
+- Enable `allow_ntlmv1: true` if you get authentication errors.
+- Check logs for details — the mounter service logs mount errors and lists available shares if detection fails.
+
+---
+
+## Security Notes
+
+- **SMB1 and NTLMv1 are insecure.** This add-on is a **gateway**:
+  - It uses SMB1 internally to connect to the Time Capsule.
+  - It re-exports the data via SMB2/3, so your LAN devices connect securely.
+- Do not expose SMB1 directly to your network.
+
+---
+
+## License
+
+GPL-3.0

@@ -1,101 +1,76 @@
 #!/usr/bin/with-contenv bashio
-# Configure Samba at container init using Home Assistant bashio
 set -euo pipefail
 
-# Read options
-WORKGROUP="$(bashio::config 'workgroup')"
-SHARE_NAME="$(bashio::config 'share_name')"
-EXPORT_PATH="$(bashio::config 'export_path')"
-USERNAME="$(bashio::config 'username')"
-PASSWORD="$(bashio::config 'password')"
-READ_ONLY="$(bashio::config 'read_only')"
-ALLOW_SMB1="$(bashio::config 'allow_smb1')"
+TC_HOST="$(bashio::config 'tc_host')"
+TC_SHARE="$(bashio::config 'tc_share')"
+TC_USER="$(bashio::config 'tc_username')"
+TC_PASS="$(bashio::config 'tc_password')"
+TC_DOMAIN="$(bashio::config 'tc_domain')"
+MOUNT_POINT="$(bashio::config 'mount_point')"
+REXPORT_NAME="$(bashio::config 'reexport_share_name')"
 ALLOW_NTLMV1="$(bashio::config 'allow_ntlmv1')"
-GUEST_OK="$(bashio::config 'guest_ok')"
-
-# Arrays (JSON) to space-separated lists
+ALLOW_SMB1="$(bashio::config 'allow_smb1')"
 HOSTS_ALLOW_JSON="$(bashio::config 'hosts_allow')"
 INTERFACES_JSON="$(bashio::config 'interfaces')"
 
 HOSTS_ALLOW="$(echo "${HOSTS_ALLOW_JSON}" | jq -r '.[]' | xargs || true)"
 INTERFACES="$(echo "${INTERFACES_JSON}" | jq -r '.[]' | xargs || true)"
 
-mkdir -p "${EXPORT_PATH}" /etc/samba
+mkdir -p "${MOUNT_POINT}" /data /etc/samba /root/.smb /run/samba /share
 
-# Build smb.conf
-{
-  echo "[global]"
-  echo "   server role = standalone server"
-  echo "   server string = SMB1 Proxy"
-  echo "   workgroup = ${WORKGROUP}"
-  echo "   log file = /dev/stdout"
-  echo "   max log size = 0"
-  echo "   load printers = no"
-  echo "   disable spoolss = yes"
-  echo "   dns proxy = no"
+cat > /etc/samba/smb.conf <<CONF
+[global]
+   client min protocol = $( [ "${ALLOW_SMB1}" = "true" ] && echo NT1 || echo SMB2 )
+   client max protocol = SMB3
+   $( [ "${ALLOW_NTLMV1}" = "true" ] && echo "client ntlmv2 auth = no" || echo "client ntlmv2 auth = yes" )
+   $( [ "${ALLOW_NTLMV1}" = "true" ] && echo "ntlm auth = yes" || echo "ntlm auth = no" )
+CONF
 
-  # Protocol min/max
-  if [ "${ALLOW_SMB1}" = "true" ]; then
-    echo "   server min protocol = NT1"
-    echo "   server max protocol = SMB3"
-  else
-    echo "   server min protocol = SMB2"
-    echo "   server max protocol = SMB3"
-  fi
+AUTH_FILE="/root/.smb/smbnetfs.auth"
+cat > "${AUTH_FILE}" <<EOF
+auth "${TC_HOST}" "${TC_SHARE}" "${TC_USER}" "${TC_PASS}" "${TC_DOMAIN}"
+EOF
+chmod 600 "${AUTH_FILE}"
 
-  # Auth
-  if [ "${ALLOW_NTLMV1}" = "true" ]; then
-    echo "   ntlm auth = yes"
-  else
-    echo "   ntlm auth = no"
-  fi
+cat > /root/.smb/smbnetfs.conf <<'EOF'
+# smbnetfs minimal config; client protocol forced by /etc/samba/smb.conf
+EOF
 
-  echo "   map to guest = Bad User"
-  echo "   passdb backend = tdbsam"
+cat > /etc/samba/smb-server.conf <<CONF
+[global]
+   server role = standalone server
+   server string = SMB1 TimeCapsule Gateway
+   workgroup = WORKGROUP
+   log file = /dev/stdout
+   max log size = 0
+   map to guest = Bad User
+   passdb backend = tdbsam
+   server min protocol = SMB2
+   server max protocol = SMB3
+   $( [ "${ALLOW_NTLMV1}" = "true" ] && echo "ntlm auth = yes" || echo "ntlm auth = no" )
+   $( [ -n "${INTERFACES}" ] && echo "interfaces = ${INTERFACES}" )
+   $( [ -n "${INTERFACES}" ] && echo "bind interfaces only = yes" )
 
-  # Networking
-  if [ -n "${INTERFACES}" ]; then
-    echo "   interfaces = ${INTERFACES}"
-    echo "   bind interfaces only = yes"
-  fi
-  if [ -n "${HOSTS_ALLOW}" ]; then
-    echo "   hosts allow = ${HOSTS_ALLOW}"
-  fi
+[${REXPORT_NAME}]
+   path = ${MOUNT_POINT}
+   browseable = yes
+   writeable = yes
+   read only = no
+   guest ok = no
+   force user = root
+   create mask = 0644
+   directory mask = 0755
+CONF
 
-  echo ""
-  echo "[${SHARE_NAME}]"
-  echo "   path = ${EXPORT_PATH}"
-  echo "   browseable = yes"
-  if [ "${READ_ONLY}" = "true" ]; then
-    echo "   read only = yes"
-    echo "   writeable = no"
-  else
-    echo "   read only = no"
-    echo "   writeable = yes"
-  fi
-  if [ "${GUEST_OK}" = "true" ]; then
-    echo "   guest ok = yes"
-  else
-    echo "   guest ok = no"
-  fi
-  echo "   force user = root"
-  echo "   create mask = 0644"
-  echo "   directory mask = 0755"
-} > /etc/samba/smb.conf
-
-bashio::log.info "Generated /etc/samba/smb.conf:"
-cat /etc/samba/smb.conf
-
-# Create/Update SMB user if not guest
-if [ "${GUEST_OK}" != "true" ]; then
-  if pdbedit -L | grep -q "^${USERNAME}:"; then
-    bashio::log.info "Updating SMB password for user ${USERNAME}"
-    (echo "${PASSWORD}"; echo "${PASSWORD}") | smbpasswd -s "${USERNAME}" || true
-  else
-    bashio::log.info "Creating SMB user ${USERNAME}"
-    adduser -D -H -s /sbin/nologin "${USERNAME}" 2>/dev/null || adduser --disabled-password --gecos "" "${USERNAME}" || true
-    (echo "${PASSWORD}"; echo "${PASSWORD}") | smbpasswd -a -s "${USERNAME}"
-  fi
+if [ -n "${HOSTS_ALLOW}" ]; then
+  echo "   hosts allow = ${HOSTS_ALLOW}" >> /etc/samba/smb-server.conf
 fi
 
-bashio::log.info "smb1-proxy configuration complete."
+if pdbedit -L | grep -q "^${TC_USER}:"; then
+  (echo "${TC_PASS}"; echo "${TC_PASS}") | smbpasswd -s "${TC_USER}" || true
+else
+  adduser -D -H -s /sbin/nologin "${TC_USER}" 2>/dev/null || adduser --disabled-password --gecos "" "${TC_USER}" || true
+  (echo "${TC_PASS}"; echo "${TC_PASS}") | smbpasswd -a -s "${TC_USER}"
+fi
+
+bashio::log.info "Config ready. Will mount //${TC_HOST}/${TC_SHARE} -> ${MOUNT_POINT}."

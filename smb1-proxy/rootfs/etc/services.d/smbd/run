@@ -1,35 +1,23 @@
 #!/usr/bin/with-contenv sh
 set -eu
-
-# Ensure runtime dir
 mkdir -p /run/samba
 
-# Helper to check if pidfile points to a live process
 is_alive() {
-  _pidfile="$1"
-  if [ -f "$_pidfile" ]; then
-    _pid="$(cat "$_pidfile" || true)"
-    if [ -n "$_pid" ] && kill -0 "$_pid" 2>/dev/null; then
-      return 0
-    fi
+  _f="$1"
+  if [ -f "$_f" ]; then
+    _p="$(cat "$_f" || true)"
+    [ -n "$_p" ] && kill -0 "$_p" 2>/dev/null && return 0
   fi
   return 1
 }
 
-# nmbd: only start if not already running; clear stale pid if needed
 if is_alive /run/samba/nmbd.pid; then
   echo "[info] nmbd already running (PID $(cat /run/samba/nmbd.pid)); not starting another."
 else
   echo "[info] starting nmbd"
   rm -f /run/samba/nmbd.pid
-  # Run nmbd in background with foreground mode so it stays attached to this process group
   nmbd -F &
 fi
 
-# smbd: clear stale pid; run in foreground and log to stdout
-rm -f /run/samba/smbd.pid
-
 echo "[info] starting smbd (foreground)"
-# Use --debug-stdout (supported) instead of --log-stdout (unsupported on your samba)
-# --no-process-group keeps signals working under s6
-exec smbd --foreground --no-process-group --debug-stdout --configfile=/etc/samba/smb.conf
+exec smbd --foreground --no-process-group --debug-stdout --configfile=/etc/samba/smb-server.conf
