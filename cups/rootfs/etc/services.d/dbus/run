@@ -1,9 +1,18 @@
 #!/usr/bin/with-contenv sh
 set -eu
 mkdir -p /run/dbus
+
 if [ -f /run/dbus/pid ]; then
-  if ! kill -0 "$(cat /run/dbus/pid)" 2>/dev/null; then
+  PID="$(cat /run/dbus/pid || true)"
+  if [ -n "${PID}" ] && kill -0 "${PID}" 2>/dev/null; then
+    echo "[info] D-Bus already running on PID ${PID}; not starting another instance."
+    # Keep the service alive in foreground; Avahi/CUPS can talk to existing bus.
+    exec tail -f /dev/null
+  else
+    echo "[warn] Stale D-Bus PID file found; removing."
     rm -f /run/dbus/pid
   fi
 fi
-exec /usr/bin/dbus-daemon --system --nofork
+
+# Start a fresh system bus in foreground; avoid pidfile conflicts.
+exec /usr/bin/dbus-daemon --system --nofork --nopidfile
