@@ -1,12 +1,11 @@
 ---
 build_from:
-  aarch64: ghcr.io/home-assistant/aarch64-base-alpine:3.19
-  amd64: ghcr.io/home-assistant/amd64-base-alpine:3.19
-  armv7: ghcr.io/home-assistant/armv7-base-alpine:3.19
-  armhf: ghcr.io/home-assistant/armhf-base-alpine:3.19
-  i386: ghcr.io/home-assistant/i386-base-alpine:3.19
+  aarch64: ghcr.io/home-assistant/aarch64-base-debian:bookworm
+  amd64: ghcr.io/home-assistant/aarch64-base-debian:bookworm
+  arm64: ghcr.io/home-assistant/aarch64-base-debian:bookworm
+  armv7: ghcr.io/home-assistant/aarch64-base-debian:bookworm
 args:
-  BUILD_FROM: ghcr.io/home-assistant/aarch64-base-alpine:3.19
+  BUILD_FROM: ghcr.io/home-assistant/aarch64-base-debian:bookworm
 codenotary:
   base_image: notary@home-assistant.io
   signer: notary@home-assistant.io
