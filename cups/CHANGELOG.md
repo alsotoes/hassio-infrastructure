@@ -1,14 +1,18 @@
 # Changelog
 
-## 1.4
+## 1.4.1
 
 - fixing avahi issues/8
 
-## 1.3
+## 1.4.0
+
+- fixing avahi issues/8
+
+## 1.3.0
 
 - Removing ulimit to fix issues/7, I don't have documentation about really needed
 
-## 1.2
+## 1.2.0
 
 - No changes on packages or configuration
 - Adding amd64 on config files

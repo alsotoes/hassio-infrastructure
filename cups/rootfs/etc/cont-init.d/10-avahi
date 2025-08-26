@@ -1,0 +1,27 @@
+#!/usr/bin/with-contenv bash
+set -euo pipefail
+
+CFG_DIR="/etc/avahi"
+mkdir -p "${CFG_DIR}"
+
+AVAHI_HOSTNAME="$(bashio::config 'avahi_hostname')"
+AVAHI_IFACE="$(bashio::config 'avahi_interface')"
+PUBLISH_WS="$(bashio::config 'avahi_publish_workstation')"
+
+cat > "${CFG_DIR}/avahi-daemon.conf" <<EOF
+[server]
+host-name=${AVAHI_HOSTNAME}
+domain-name=local
+use-ipv4=yes
+use-ipv6=no
+allow-interfaces=${AVAHI_IFACE}
+publish-aaaa-on-ipv4=no
+publish-a-on-ipv6=no
+
+[wide-area]
+enable-wide-area=no
+
+[publish]
+publish-hinfo=no
+publish-workstation=$( [ "${PUBLISH_WS}" = "true" ] && echo "yes" || echo "no" )
+EOF

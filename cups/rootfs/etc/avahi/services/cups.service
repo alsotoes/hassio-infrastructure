@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone='no'?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+  <name replace-wildcards="no">__CUPS_SERVICE_NAME__</name>
+  <service>
+    <type>_ipp._tcp</type>
+    <port>631</port>
+  </service>
+  <service>
+    <type>_printer._tcp</type>
+    <port>515</port>
+  </service>
+</service-group>
