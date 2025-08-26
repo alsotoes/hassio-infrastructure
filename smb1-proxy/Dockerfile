@@ -1,5 +1,5 @@
 # Multi-arch Home Assistant add-on base (Alpine + s6-overlay v3)
-ARG BUILD_FROM=ghcr.io/home-assistant/aarch64-base-alpine:3.19
+ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
 # hadolint ignore=DL3018
