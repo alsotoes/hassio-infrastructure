@@ -1,2 +1,9 @@
 #!/usr/bin/with-contenv sh
+set -eu
+mkdir -p /run/dbus
+if [ -f /run/dbus/pid ]; then
+  if ! kill -0 "$(cat /run/dbus/pid)" 2>/dev/null; then
+    rm -f /run/dbus/pid
+  fi
+fi
 exec /usr/bin/dbus-daemon --system --nofork
