@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.2
+
+- Adding CUPS Web Admin UI explicitly.
+
 ## 1.4.1
 
 - fixing avahi issues/8

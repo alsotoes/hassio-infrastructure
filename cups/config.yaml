@@ -1,7 +1,7 @@
 name: CUPS Print Server
 slug: cups
-description: "CUPS printing system with Avahi for AirPrint/IPP"
-version: "1.4.1"
+description: "CUPS printing system with Avahi for AirPrint/IPP and Web Admin"
+version: "1.4.2"
 arch:
   - aarch64
   - amd64
@@ -14,13 +14,26 @@ init: false
 map:
   - config:rw
   - share:rw
+
 options:
   avahi_hostname: "cupsik"
   avahi_interface: "eth0"
   avahi_publish_workstation: false
   cups_service_name: "CUPS Print Server"
+  enable_web_admin: true
+  admin_allow_subnets:
+    - "127.0.0.1"
+    - "192.168.0.0/16"
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+  require_auth_on_admin: false
+
 schema:
   avahi_hostname: str
   avahi_interface: str
   avahi_publish_workstation: bool
   cups_service_name: str
+  enable_web_admin: bool
+  admin_allow_subnets:
+    - str
+  require_auth_on_admin: bool
