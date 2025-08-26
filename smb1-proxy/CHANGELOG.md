@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0
+## 1.2.0
 
 - Changing the entire structure for a more modern hassio add-on looklike
 - Re-architected to avoid kernel CIFS mounts; no special capabilities needed; compatible with HA Core 2025.8.x
