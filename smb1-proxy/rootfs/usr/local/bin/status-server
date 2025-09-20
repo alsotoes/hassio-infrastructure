@@ -2,10 +2,12 @@
 set -e
 
 PORT=9876
-MOUNT_POINT="$(bashio::config 'mount_point')"
-TC_HOST="$(bashio::config 'tc_host')"
-TC_SHARE="$(bashio::config 'tc_share')"
-REEXPORT_NAME="$(bashio::config 'reexport_share_name')"
+MOUNT_POINT="$(bashio::config 'mount_point' || echo '/data/timecapsule')"
+TC_HOST="$(bashio::config 'tc_host' || echo 'unknown')"
+TC_SHARE="$(bashio::config 'tc_share' || echo 'unknown')"
+REEXPORT_NAME="$(bashio::config 'reexport_share_name' || echo 'unknown')"
+
+bashio::log.info "Starting web server on port ${PORT}"
 
 get_status() {
     local status="OK"
@@ -21,12 +23,12 @@ get_status() {
     fi
     
     # Check processes
-    if ! pgrep -f smbnetfs >/dev/null; then
+    if ! pgrep -f smbnetfs >/dev/null 2>&1; then
         smbnetfs_status="Stopped"
         status="ERROR"
     fi
     
-    if ! pgrep -f smbd >/dev/null; then
+    if ! pgrep -f smbd >/dev/null 2>&1; then
         smbd_status="Stopped"
         status="ERROR"
     fi
@@ -55,7 +57,7 @@ EOF
 
 get_html() {
     local json_status=$(get_status)
-    local status=$(echo "$json_status" | jq -r '.status')
+    local status=$(echo "$json_status" | jq -r '.status' 2>/dev/null || echo "UNKNOWN")
     local status_color="green"
     [ "$status" = "ERROR" ] && status_color="red"
     
@@ -93,22 +95,6 @@ get_html() {
                 <span class="label">Mount Path:</span>
                 <span>${MOUNT_POINT}</span>
             </div>
-            <div class="info">
-                <span class="label">Mount Status:</span>
-                <span class="$(echo "$json_status" | jq -r '.mount.status' | tr '[:upper:]' '[:lower:]')">$(echo "$json_status" | jq -r '.mount.status')</span>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h3>Services</h3>
-            <div class="info">
-                <span class="label">FUSE smbnetfs:</span>
-                <span class="$(echo "$json_status" | jq -r '.services.smbnetfs' | tr '[:upper:]' '[:lower:]')">$(echo "$json_status" | jq -r '.services.smbnetfs')</span>
-            </div>
-            <div class="info">
-                <span class="label">Samba Server:</span>
-                <span class="$(echo "$json_status" | jq -r '.services.smbd' | tr '[:upper:]' '[:lower:]')">$(echo "$json_status" | jq -r '.services.smbd')</span>
-            </div>
         </div>
         
         <div class="section">
@@ -119,7 +105,7 @@ get_html() {
             </div>
             <div class="info">
                 <span class="label">Last Check:</span>
-                <span>$(echo "$json_status" | jq -r '.last_check')</span>
+                <span>$(date)</span>
             </div>
         </div>
         
@@ -135,30 +121,58 @@ get_html() {
 EOF
 }
 
-# Simple HTTP server using netcat
-while true; do
-    {
-        read -r request
-        case "$request" in
-            "GET /api/status"*)
-                echo "HTTP/1.1 200 OK"
-                echo "Content-Type: application/json"
-                echo "Access-Control-Allow-Origin: *"
-                echo ""
-                get_status
-                ;;
-            "GET /"* | "GET /index.html"*)
-                echo "HTTP/1.1 200 OK"
-                echo "Content-Type: text/html"
-                echo ""
-                get_html
-                ;;
-            *)
-                echo "HTTP/1.1 404 Not Found"
-                echo "Content-Type: text/plain"
-                echo ""
-                echo "404 Not Found"
-                ;;
-        esac
-    } | nc -l -p $PORT -q 1
-done
+# Start simple HTTP server using Python if available, otherwise netcat
+if command -v python3 >/dev/null 2>&1; then
+    bashio::log.info "Using Python HTTP server"
+    cd /tmp
+    cat > server.py <<EOF
+import http.server
+import socketserver
+import subprocess
+import json
+
+class StatusHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/api/status':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            result = subprocess.run(['/usr/local/bin/status-server-helper', 'json'], capture_output=True, text=True)
+            self.wfile.write(result.stdout.encode())
+        elif self.path == '/' or self.path == '/index.html':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            result = subprocess.run(['/usr/local/bin/status-server-helper', 'html'], capture_output=True, text=True)
+            self.wfile.write(result.stdout.encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b'404 Not Found')
+
+with socketserver.TCPServer(("", ${PORT}), StatusHandler) as httpd:
+    httpd.serve_forever()
+EOF
+    
+    # Create helper script
+    cat > /usr/local/bin/status-server-helper <<'HELPER'
+#!/usr/bin/with-contenv bashio
+MOUNT_POINT="$(bashio::config 'mount_point' || echo '/data/timecapsule')"
+TC_HOST="$(bashio::config 'tc_host' || echo 'unknown')"
+TC_SHARE="$(bashio::config 'tc_share' || echo 'unknown')"
+REEXPORT_NAME="$(bashio::config 'reexport_share_name' || echo 'unknown')"
+
+if [ "$1" = "json" ]; then
+    echo '{"status":"OK","mount":{"path":"'$MOUNT_POINT'","target":"'$TC_HOST'/'$TC_SHARE'"},"config":{"host":"'$TC_HOST'","share":"'$TC_SHARE'","reexport_name":"'$REEXPORT_NAME'"}}'
+else
+    echo '<html><body><h1>SMB1 Proxy Status</h1><p>Status: OK</p><p>Mount: '$MOUNT_POINT'</p><p>Target: '$TC_HOST'/'$TC_SHARE'</p></body></html>'
+fi
+HELPER
+    chmod +x /usr/local/bin/status-server-helper
+    
+    exec python3 server.py
+else
+    bashio::log.error "Python3 not available, web server cannot start"
+    exit 1
+fi

@@ -14,7 +14,8 @@ RUN apt-get update && \
         jq \
         bash \
         ca-certificates \
-        netcat-openbsd && \
+        netcat-openbsd \
+        python3 && \
     apt-get autoremove -y && \
     apt-get autoclean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \

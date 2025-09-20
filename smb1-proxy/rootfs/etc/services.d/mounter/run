@@ -32,43 +32,92 @@ trap cleanup SIGTERM SIGINT SIGQUIT
 # Function to mount smbnetfs
 mount_smbnetfs() {
     bashio::log.info "Mounting via FUSE smbnetfs..."
+    bashio::log.info "Config: TC_HOST=${TC_HOST}, TC_SHARE=${TC_SHARE}, MOUNT_POINT=${MOUNT_POINT}"
     
     # Cleanup any existing mount
     if mountpoint -q /data/smbnet 2>/dev/null; then
-        fusermount -u /data/smbnet 2>/dev/null || true
-        sleep 1
+        bashio::log.info "Cleaning up existing smbnetfs mount..."
+        fusermount -u /data/smbnet 2>/dev/null || umount -f /data/smbnet 2>/dev/null || true
+        sleep 2
     fi
     
-    smbnetfs /data/smbnet -o allow_other,nonempty || { 
-        bashio::log.error "smbnetfs failed"; 
-        return 1; 
-    }
-    sleep 2
-
-    if [ -d "/data/smbnet/${TC_HOST}/${TC_SHARE}" ]; then
-        TARGET="/data/smbnet/${TC_HOST}/${TC_SHARE}"
-    elif [ -d "/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}" ]; then
-        TARGET="/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}"
-    else
-        UPPER="$(echo "${TC_HOST}" | tr '[:lower:]' '[:upper:]')"
-        if [ -d "/data/smbnet/${UPPER}/${TC_SHARE}" ]; then
-            TARGET="/data/smbnet/${UPPER}/${TC_SHARE}"
+    # Kill any existing smbnetfs processes
+    pkill -f smbnetfs 2>/dev/null || true
+    sleep 1
+    
+    # Start smbnetfs with more verbose logging
+    bashio::log.info "Starting smbnetfs..."
+    if ! smbnetfs /data/smbnet -o allow_other,nonempty,debug=1; then
+        bashio::log.error "smbnetfs failed to start"
+        return 1
+    fi
+    
+    # Wait longer for smbnetfs to initialize
+    sleep 5
+    
+    # Check what's available in smbnetfs
+    bashio::log.info "Checking smbnetfs mount contents..."
+    if ! ls -la /data/smbnet/ 2>/dev/null; then
+        bashio::log.error "Cannot list /data/smbnet/ - smbnetfs may not be working"
+        return 1
+    fi
+    
+    # Try different hostname variations
+    TARGET=""
+    for host_variant in "${TC_HOST}" "$(echo "${TC_HOST}" | tr '[:lower:]' '[:upper:]')" "$(getent hosts "${TC_HOST}" 2>/dev/null | awk '{print $1}' | head -1)"; do
+        [ -z "$host_variant" ] && continue
+        bashio::log.info "Trying host variant: '${host_variant}'"
+        
+        if [ -d "/data/smbnet/${host_variant}" ]; then
+            bashio::log.info "Found host directory: ${host_variant}"
+            bashio::log.info "Available shares in ${host_variant}:"
+            ls -la "/data/smbnet/${host_variant}/" 2>/dev/null || bashio::log.warning "Cannot list shares"
+            
+            if [ -d "/data/smbnet/${host_variant}/${TC_SHARE}" ]; then
+                TARGET="/data/smbnet/${host_variant}/${TC_SHARE}"
+                bashio::log.info "Found target share: ${TARGET}"
+                break
+            else
+                bashio::log.warning "Share '${TC_SHARE}' not found in ${host_variant}"
+            fi
         else
-            bashio::log.error "Could not locate share inside smbnetfs tree."
-            ls -la /data/smbnet || true
-            return 1
+            bashio::log.warning "Host directory not found: ${host_variant}"
         fi
+    done
+
+    if [ -z "$TARGET" ]; then
+        bashio::log.error "Could not locate share '${TC_SHARE}' on host '${TC_HOST}'"
+        bashio::log.info "Available hosts in smbnetfs:"
+        ls -la /data/smbnet/ 2>/dev/null || bashio::log.error "smbnetfs mount is empty or inaccessible"
+        return 1
     fi
 
-    rm -rf "${MOUNT_POINT}" && ln -s "${TARGET}" "${MOUNT_POINT}"
-    bashio::log.info "FUSE smbnetfs mounted. ${MOUNT_POINT} -> ${TARGET}"
+    # Test access to the target
+    bashio::log.info "Testing access to ${TARGET}..."
+    if ! timeout 15 ls "${TARGET}" >/dev/null 2>&1; then
+        bashio::log.error "Cannot access target share ${TARGET} - authentication or network issue"
+        return 1
+    fi
+
+    # Create symlink
+    rm -rf "${MOUNT_POINT}" 2>/dev/null || true
+    if ! ln -s "${TARGET}" "${MOUNT_POINT}"; then
+        bashio::log.error "Failed to create symlink ${MOUNT_POINT} -> ${TARGET}"
+        return 1
+    fi
+    
+    bashio::log.info "FUSE smbnetfs mounted successfully: ${MOUNT_POINT} -> ${TARGET}"
     
     # Expose under /share for other add-ons / file access
     if [ "${EXPOSE_IN_SHARE}" = "true" ]; then
-        mkdir -p /share
+        mkdir -p /share >/dev/null 2>&1 || true
         LINK="/share/${SHARE_LINK_NAME}"
-        rm -rf "${LINK}" && ln -s "${MOUNT_POINT}" "${LINK}"
-        bashio::log.info "Exposed ${MOUNT_POINT} at ${LINK}"
+        rm -rf "${LINK}" 2>/dev/null || true
+        if ln -s "${MOUNT_POINT}" "${LINK}"; then
+            bashio::log.info "Exposed ${MOUNT_POINT} at ${LINK}"
+        else
+            bashio::log.warning "Failed to create share link ${LINK}"
+        fi
     fi
     
     return 0
