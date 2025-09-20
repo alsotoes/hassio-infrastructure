@@ -19,7 +19,6 @@ profile etcd flags=(attach_disconnected,mediate_deleted) {
   /run.sh ix,
   /bin/bash ix,
   /usr/bin/curl ix,
-  /usr/bin/bashio ix,
 
   # Libraries
   /lib/** mr,

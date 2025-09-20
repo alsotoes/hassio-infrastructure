@@ -1,4 +1,4 @@
-#!/usr/bin/env bashio
+#!/bin/bash
 # -*- coding: utf-8 -*-
 
 export ETCD_NAME="etcd"

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Fix: bashio permission denied error by switching to standard bash
+- Update: AppArmor profile cleaned up (removed bashio reference)
+
 ## 0.1.0
 
 - Fix: Container initialization permission error (/init)

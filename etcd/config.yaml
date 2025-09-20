@@ -1,6 +1,6 @@
 ---
 name: etcd Server
-version: "0.1.0"
+version: "0.1.1"
 slug: etcd
 description: A distributed, reliable key-value store for the most critical data of a distributed system
 url: https://github.com/alsotoes/hassio-infrastructure/tree/main/etcd
