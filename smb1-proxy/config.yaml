@@ -1,8 +1,8 @@
 ---
 name: SMB1 Proxy
 slug: smb1_proxy
-description: "Serve a local path over SMB with optional SMB1/NT1 support (no kernel mounts)."
-version: "1.2.9"
+description: "Bridge legacy SMB1 devices (Apple Time Capsule) to modern SMB2/3 with web monitoring and auto-recovery."
+version: "1.3.0"
 url: "https://github.com/alsotoes/hassio-infrastructure/tree/main/smb1-proxy"
 arch:
   - aarch64
@@ -19,7 +19,7 @@ ingress_port: 8080
 ports:
   8080/tcp: 8080
 
-apparmor: true
+apparmor: false
 privileged:
   - SYS_ADMIN
 devices:

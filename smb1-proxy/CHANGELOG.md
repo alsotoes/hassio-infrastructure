@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0
+
+- Disabled AppArmor to resolve s6-overlay init system compatibility issues
+- Improved add-on description to highlight key features
+- Replaced old PNG icons with new One Piece jigsaw puzzle themed SVG designs
+- Prioritized functionality over security profile for better user experience
+
 ## 1.2.9
 
 - Added multi-architecture support (aarch64, amd64, armhf, armv7, i386)
