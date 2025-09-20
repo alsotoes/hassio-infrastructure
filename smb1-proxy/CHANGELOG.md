@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.1
+
+- Fixed JSON parsing errors in configuration script with better error handling
+- Resolved directory creation conflicts on container restarts
+- Added proper PNG icon and logo files (512x512) with One Piece jigsaw puzzle theme
+- Improved configuration script robustness with fallback values
+
 ## 1.3.0
 
 - Disabled AppArmor to resolve s6-overlay init system compatibility issues

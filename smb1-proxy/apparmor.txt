@@ -1,3 +1,7 @@
+# AppArmor profile for SMB1 Proxy add-on
+# Currently disabled in config.yaml due to s6-overlay compatibility issues
+# Can be re-enabled in future versions after further testing
+
 #include <tunables/global>
 
 profile smb1_proxy flags=(attach_disconnected,mediate_deleted) {

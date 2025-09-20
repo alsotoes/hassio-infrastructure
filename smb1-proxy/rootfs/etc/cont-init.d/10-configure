@@ -13,23 +13,24 @@ ALLOW_NTLMV1="$(bashio::config 'allow_ntlmv1')"
 ALLOW_SMB1="$(bashio::config 'allow_smb1')"
 
 if bashio::config.has_value 'hosts_allow'; then
-  HOSTS_ALLOW_JSON="$(bashio::config 'hosts_allow')"
-  if [ "${HOSTS_ALLOW_JSON}" = "null" ] || [ -z "${HOSTS_ALLOW_JSON}" ]; then
-    HOSTS_ALLOW_JSON='[]'
-  fi
+  HOSTS_ALLOW_JSON="$(bashio::config 'hosts_allow' || echo '[]')"
 else
   HOSTS_ALLOW_JSON='[]'
 fi
 if bashio::config.has_value 'interfaces'; then
-  INTERFACES_JSON="$(bashio::config 'interfaces')"
-  if [ "${INTERFACES_JSON}" = "null" ] || [ -z "${INTERFACES_JSON}" ]; then
-    INTERFACES_JSON='[]'
-  fi
+  INTERFACES_JSON="$(bashio::config 'interfaces' || echo '[]')"
 else
   INTERFACES_JSON='[]'
 fi
-HOSTS_ALLOW="$(echo "${HOSTS_ALLOW_JSON}" | jq -r '.[]? // empty' | tr '\n' ' ' | xargs || true)"
-INTERFACES="$(echo "${INTERFACES_JSON}" | jq -r '.[]? // empty' | tr '\n' ' ' | xargs || true)"
+
+# Ensure valid JSON arrays
+[ "${HOSTS_ALLOW_JSON}" = "null" ] && HOSTS_ALLOW_JSON='[]'
+[ "${INTERFACES_JSON}" = "null" ] && INTERFACES_JSON='[]'
+[ -z "${HOSTS_ALLOW_JSON}" ] && HOSTS_ALLOW_JSON='[]'
+[ -z "${INTERFACES_JSON}" ] && INTERFACES_JSON='[]'
+
+HOSTS_ALLOW="$(echo "${HOSTS_ALLOW_JSON}" | jq -r '.[]? // empty' 2>/dev/null | tr '\n' ' ' | xargs || echo '')"
+INTERFACES="$(echo "${INTERFACES_JSON}" | jq -r '.[]? // empty' 2>/dev/null | tr '\n' ' ' | xargs || echo '')"
 
 NETBIOS_NAME_OPT="$(bashio::config 'netbios_name' || true)"
 if [ -n "${NETBIOS_NAME_OPT:-}" ]; then
@@ -41,7 +42,7 @@ else
 fi
 
 for dir in "${MOUNT_POINT}" /data /etc/samba /root/.smb /run/samba /share; do
-  [ ! -d "$dir" ] && mkdir -p "$dir"
+  [ ! -d "$dir" ] && mkdir -p "$dir" 2>/dev/null || true
 done
 
 cat > /etc/samba/smb.conf <<CONF
