@@ -1,0 +1,55 @@
+#include <tunables/global>
+
+profile etcd flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  # Capabilities
+  capability setuid,
+  capability setgid,
+  capability net_bind_service,
+
+  # Network access
+  network inet stream,
+  network inet dgram,
+
+  # Executables
+  /usr/local/bin/etcd ix,
+  /usr/local/bin/etcdctl ix,
+  /usr/local/bin/etcdutl ix,
+  /run.sh ix,
+  /bin/bash ix,
+  /usr/bin/curl ix,
+
+  # Data directory (etcd storage)
+  /data/ rw,
+  /data/** rw,
+
+  # System files
+  /etc/passwd r,
+  /etc/group r,
+  /etc/hosts r,
+  /etc/resolv.conf r,
+  /etc/ssl/certs/ r,
+  /etc/ssl/certs/** r,
+
+  # Proc filesystem
+  @{PROC}/sys/net/core/somaxconn r,
+  @{PROC}/meminfo r,
+  @{PROC}/stat r,
+  @{PROC}/loadavg r,
+  @{PROC}/sys/kernel/hostname r,
+
+  # Temp files
+  /tmp/ rw,
+  /tmp/** rw,
+
+  # Health check endpoint
+  /health r,
+
+  # Deny dangerous operations
+  deny /proc/sys/kernel/** w,
+  deny mount,
+  deny umount,
+  deny ptrace,
+  deny @{PROC}/sys/vm/** w,
+}

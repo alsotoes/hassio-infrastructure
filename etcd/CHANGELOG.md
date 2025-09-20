@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.9
+
+- Add: AppArmor security profile for enhanced container security
+- Update: etcd to v3.6.0
+- Security: Implement mandatory access controls with AppArmor
+
 ## 0.0.8
 
 - Fix: issues/3
