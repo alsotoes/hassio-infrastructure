@@ -7,7 +7,6 @@ TC_USER="$(bashio::config 'tc_username')"
 TC_PASS="$(bashio::config 'tc_password')"
 TC_DOMAIN="$(bashio::config 'tc_domain')"
 MOUNT_POINT="$(bashio::config 'mount_point')"
-USE_KERNEL_CIFS="$(bashio::config 'use_kernel_cifs')"
 ALLOW_NTLMV1="$(bashio::config 'allow_ntlmv1')"
 ALLOW_SMB1="$(bashio::config 'allow_smb1')"
 EXPOSE_IN_SHARE="$(bashio::config 'expose_in_share')"
@@ -15,49 +14,27 @@ SHARE_LINK_NAME="$(bashio::config 'share_link_name')"
 
 mkdir -p "${MOUNT_POINT}" /data/smbnet /share
 
-KOPTS="vers=1.0,iocharset=utf8,nounix,serverino,uid=0,gid=0,file_mode=0644,dir_mode=0755,soft"
-if [ -n "${TC_DOMAIN}" ]; then
-  KOPTS="${KOPTS},domain=${TC_DOMAIN}"
-fi
-if [ "${ALLOW_NTLMV1}" = "true" ]; then
-  KOPTS="${KOPTS},sec=ntlm"
+bashio::log.info "Mounting via FUSE smbnetfs..."
+smbnetfs /data/smbnet -o allow_other,nonempty || { bashio::log.error "smbnetfs failed"; exit 1; }
+sleep 2
+
+if [ -d "/data/smbnet/${TC_HOST}/${TC_SHARE}" ]; then
+  TARGET="/data/smbnet/${TC_HOST}/${TC_SHARE}"
+elif [ -d "/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}" ]; then
+  TARGET="/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}"
 else
-  KOPTS="${KOPTS},sec=ntlmssp"
-fi
-
-if [ "${USE_KERNEL_CIFS}" = "true" ]; then
-  bashio::log.info "Attempting kernel CIFS mount (vers=1.0)"
-  if mount -t cifs "//${TC_HOST}/${TC_SHARE}" "${MOUNT_POINT}" -o "username=${TC_USER},password=${TC_PASS},${KOPTS}" 2>/tmp/cifs.err; then
-    bashio::log.info "Kernel CIFS mount OK."
+  UPPER="$(echo "${TC_HOST}" | tr '[:lower:]' '[:upper:]')"
+  if [ -d "/data/smbnet/${UPPER}/${TC_SHARE}" ]; then
+    TARGET="/data/smbnet/${UPPER}/${TC_SHARE}"
   else
-    bashio::log.warning "Kernel CIFS mount failed; falling back to FUSE. Error:"
-    cat /tmp/cifs.err || true
+    bashio::log.error "Could not locate share inside smbnetfs tree."
+    ls -la /data/smbnet || true
+    exit 1
   fi
 fi
 
-if ! mountpoint -q "${MOUNT_POINT}"; then
-  bashio::log.info "Mounting via FUSE smbnetfs..."
-  smbnetfs /data/smbnet -o allow_other,nonempty || { bashio::log.error "smbnetfs failed"; exit 1; }
-  sleep 2
-
-  if [ -d "/data/smbnet/${TC_HOST}/${TC_SHARE}" ]; then
-    TARGET="/data/smbnet/${TC_HOST}/${TC_SHARE}"
-  elif [ -d "/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}" ]; then
-    TARGET="/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}"
-  else
-    UPPER="$(echo "${TC_HOST}" | tr '[:lower:]' '[:upper:]')"
-    if [ -d "/data/smbnet/${UPPER}/${TC_SHARE}" ]; then
-      TARGET="/data/smbnet/${UPPER}/${TC_SHARE}"
-    else
-      bashio::log.error "Could not locate share inside smbnetfs tree."
-      ls -la /data/smbnet || true
-      exit 1
-    fi
-  fi
-
-  rm -rf "${MOUNT_POINT}" && ln -s "${TARGET}" "${MOUNT_POINT}"
-  bashio::log.info "FUSE smbnetfs mounted. ${MOUNT_POINT} -> ${TARGET}"
-fi
+rm -rf "${MOUNT_POINT}" && ln -s "${TARGET}" "${MOUNT_POINT}"
+bashio::log.info "FUSE smbnetfs mounted. ${MOUNT_POINT} -> ${TARGET}"
 
 # Expose under /share for other add-ons / file access
 if [ "${EXPOSE_IN_SHARE}" = "true" ]; then

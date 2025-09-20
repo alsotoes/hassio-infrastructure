@@ -2,7 +2,7 @@ ARG BUILD_FROM
 FROM ${BUILD_FROM}
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update  && apt-get install -y --no-install-recommends       samba smbclient cifs-utils smbnetfs fuse3 avahi-daemon dbus jq bash ca-certificates  && rm -rf /var/lib/apt/lists/*
+RUN apt-get update  && apt-get install -y --no-install-recommends       samba smbclient smbnetfs fuse3 avahi-daemon dbus jq bash ca-certificates  && rm -rf /var/lib/apt/lists/*
 
 COPY rootfs /
 

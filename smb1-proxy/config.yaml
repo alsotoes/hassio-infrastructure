@@ -2,7 +2,7 @@
 name: SMB1 Proxy
 slug: smb1_proxy
 description: "Serve a local path over SMB with optional SMB1/NT1 support (no kernel mounts)."
-version: "1.2.1"
+version: "1.2.2"
 url: "https://github.com/alsotoes/hassio-infrastructure/tree/main/smb1-proxy"
 arch:
   - aarch64
@@ -11,8 +11,6 @@ init: false
 host_network: true
 
 apparmor: false
-privileged:
-  - SYS_ADMIN
 devices:
   - /dev/fuse:/dev/fuse:rwm
 
@@ -27,7 +25,6 @@ schema:
   tc_password: str
   tc_domain: str?
   mount_point: str
-  use_kernel_cifs: bool
   reexport_share_name: str
   allow_ntlmv1: bool
   allow_smb1: bool
@@ -48,7 +45,6 @@ options:
   tc_password: "password"
   tc_domain: ""
   mount_point: "/data/timecapsule"
-  use_kernel_cifs: false
   reexport_share_name: "timecapsule"
   allow_ntlmv1: true
   allow_smb1: true

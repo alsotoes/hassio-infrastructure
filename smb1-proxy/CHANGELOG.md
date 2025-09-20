@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.2
+
+- Removed kernel CIFS support completely, now FUSE-only
+- Removed SYS_ADMIN privilege requirement
+- Removed cifs-utils package dependency
+- Simplified mounting logic to use smbnetfs exclusively
+
 ## 1.2.1
 
 - Moving to fuse to avoid kernel changes
