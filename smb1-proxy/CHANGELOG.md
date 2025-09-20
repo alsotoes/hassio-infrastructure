@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.3
+
+- Restored SYS_ADMIN privilege requirement for FUSE mounting
+- Fixed "Operation not permitted" error with smbnetfs
+
 ## 1.2.2
 
 - Removed kernel CIFS support completely, now FUSE-only

@@ -8,7 +8,7 @@ It can also expose the mounted data inside Home Assistant’s `/share` folder fo
 ## Features
 
 - Connects to legacy SMB1/NT1 servers (e.g. Apple Time Capsule).
-- Uses **FUSE smbnetfs** for secure userspace mounting.
+- Uses **FUSE smbnetfs** for secure userspace mounting (requires SYS_ADMIN for mount registration).
 - Re-exports the mounted path via **Samba SMB2/3** for modern clients.
 - Optionally exposes the mounted share at `/share/<name>` for local add-ons.
 - Supports legacy **NTLMv1 authentication** if required.
