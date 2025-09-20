@@ -27,6 +27,7 @@ It can also expose the mounted data inside Home Assistant’s `/share` folder fo
    - Go to **Settings → Add-ons → Add-on Store**.
    - Click **⋮ → Reload**.
    - Find **smb1-proxy**, click **Install**.
+   - **Supports all architectures**: aarch64, amd64, armhf, armv7, i386
 
 ---
 

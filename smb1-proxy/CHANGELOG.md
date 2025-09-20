@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.9
+
+- Added multi-architecture support (aarch64, amd64, armhf, armv7, i386)
+- Optimized container image size with aggressive cleanup and single-layer builds
+- Enhanced AppArmor profile with additional system permissions
+- Improved compatibility across all Home Assistant hardware platforms
+
 ## 1.2.8
 
 - Added ingress support for seamless Home Assistant UI integration

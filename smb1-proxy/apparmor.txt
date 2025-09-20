@@ -13,6 +13,8 @@ profile smb1_proxy flags=(attach_disconnected,mediate_deleted) {
   capability fowner,
   capability fsetid,
   capability net_bind_service,
+  capability kill,
+  capability sys_ptrace,
 
   # Network access
   network inet dgram,
@@ -151,4 +153,13 @@ profile smb1_proxy flags=(attach_disconnected,mediate_deleted) {
   # Bashio access
   /opt/bashio/ r,
   /opt/bashio/** r,
+  
+  # Library access
+  /lib/** r,
+  /usr/lib/** r,
+  /lib64/** r,
+  
+  # Additional system paths
+  /run/ rw,
+  /run/** rw,
 }
