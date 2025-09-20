@@ -8,7 +8,7 @@ It can also expose the mounted data inside Home Assistant’s `/share` folder fo
 ## Features
 
 - Connects to legacy SMB1/NT1 servers (e.g. Apple Time Capsule).
-- Supports both **kernel CIFS (vers=1.0)** and **FUSE smbnetfs** mounting.
+- Uses **FUSE smbnetfs** for secure userspace mounting.
 - Re-exports the mounted path via **Samba SMB2/3** for modern clients.
 - Optionally exposes the mounted share at `/share/<name>` for local add-ons.
 - Supports legacy **NTLMv1 authentication** if required.
@@ -36,7 +36,6 @@ tc_username: "admin"
 tc_password: "your-password"
 tc_domain: ""                      # Leave empty unless your device requires it
 mount_point: "/data/timecapsule"   # Where to mount inside the add-on
-use_kernel_cifs: false             # Try kernel CIFS first (requires CIFS support in HA OS)
 reexport_share_name: "timecapsule" # Name of the re-exported Samba share
 allow_ntlmv1: true                 # Enable if authentication fails
 allow_smb1: true                   # Force SMB1 client protocol
@@ -62,7 +61,6 @@ share_link_name: "timecapsule"     # Path: /share/timecapsule
 
 ## Troubleshooting
 
-- If you see `Kernel CIFS mount failed`, set `use_kernel_cifs: false` and rely on FUSE.
 - If `smbnetfs` cannot locate your share:
   - Use the Time Capsule’s IP instead of hostname.
   - Try uppercase hostnames (NetBIOS).
