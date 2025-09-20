@@ -64,8 +64,8 @@ share_link_name: "timecapsule"     # Path: /share/timecapsule
   - `/share/timecapsule`
 
 - **Web UI monitoring:**
-  - Status page: `http://<HA-IP>:8080`
-  - JSON API: `http://<HA-IP>:8080/api/status`
+  - Status page: `http://<HA-IP>:9876`
+  - JSON API: `http://<HA-IP>:9876/api/status`
 
 ---
 

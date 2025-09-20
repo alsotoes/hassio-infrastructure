@@ -13,7 +13,7 @@ EXPOSE_IN_SHARE="$(bashio::config 'expose_in_share')"
 SHARE_LINK_NAME="$(bashio::config 'share_link_name')"
 
 for dir in "${MOUNT_POINT}" /data/smbnet /share; do
-  [ ! -d "$dir" ] && mkdir -p "$dir"
+  mkdir -p "$dir" >/dev/null 2>&1 || true
 done
 
 # Cleanup function for graceful shutdown

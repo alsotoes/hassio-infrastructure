@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bashio
 set -e
 
 MOUNT_POINT="$(bashio::config 'mount_point')"

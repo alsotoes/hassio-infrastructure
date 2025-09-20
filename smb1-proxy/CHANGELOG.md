@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.2
+
+- Fixed bashio environment loading in status-server and health-check scripts
+- Completely silenced directory creation to prevent "File exists" messages
+- Changed web UI port from 8080 to 9876 for better port management
+- Improved script reliability with proper Home Assistant add-on environment
+
 ## 1.3.1
 
 - Fixed JSON parsing errors in configuration script with better error handling

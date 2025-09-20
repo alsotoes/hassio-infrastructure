@@ -35,4 +35,4 @@ RUN chmod 0755 \
     /usr/local/bin/health-check \
     /usr/local/bin/status-server
 
-EXPOSE 137/udp 138/udp 139/tcp 445/tcp 631/tcp 8080/tcp
+EXPOSE 137/udp 138/udp 139/tcp 445/tcp 631/tcp 9876/tcp
