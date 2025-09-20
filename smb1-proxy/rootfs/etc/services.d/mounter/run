@@ -12,7 +12,9 @@ ALLOW_SMB1="$(bashio::config 'allow_smb1')"
 EXPOSE_IN_SHARE="$(bashio::config 'expose_in_share')"
 SHARE_LINK_NAME="$(bashio::config 'share_link_name')"
 
-mkdir -p "${MOUNT_POINT}" /data/smbnet /share
+for dir in "${MOUNT_POINT}" /data/smbnet /share; do
+  [ ! -d "$dir" ] && mkdir -p "$dir"
+done
 
 bashio::log.info "Mounting via FUSE smbnetfs..."
 smbnetfs /data/smbnet -o allow_other,nonempty || { bashio::log.error "smbnetfs failed"; exit 1; }

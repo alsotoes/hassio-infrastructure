@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.5
+
+- Added AppArmor security profile for enhanced container security
+- Improved directory creation logic to check existence before mkdir
+- Enabled AppArmor protection by default
+
 ## 1.2.4
 
 - Fixed JSON parsing error in configuration script

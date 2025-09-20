@@ -40,7 +40,9 @@ else
   NETBIOS_NAME="${NETBIOS_NAME:0:15}"
 fi
 
-mkdir -p "${MOUNT_POINT}" /data /etc/samba /root/.smb /run/samba /share 2>/dev/null || true
+for dir in "${MOUNT_POINT}" /data /etc/samba /root/.smb /run/samba /share; do
+  [ ! -d "$dir" ] && mkdir -p "$dir"
+done
 
 cat > /etc/samba/smb.conf <<CONF
 [global]
