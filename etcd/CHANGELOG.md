@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Fix: run.sh execute permissions
+
 ## 0.1.1
 
 - Fix: bashio permission denied error by switching to standard bash
