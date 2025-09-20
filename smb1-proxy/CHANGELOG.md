@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.4
+
+- Fixed JSON parsing error in configuration script
+- Fixed directory creation conflicts on container restart
+- Improved error handling for empty configuration arrays
+
 ## 1.2.3
 
 - Restored SYS_ADMIN privilege requirement for FUSE mounting

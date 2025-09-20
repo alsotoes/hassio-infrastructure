@@ -14,16 +14,22 @@ ALLOW_SMB1="$(bashio::config 'allow_smb1')"
 
 if bashio::config.has_value 'hosts_allow'; then
   HOSTS_ALLOW_JSON="$(bashio::config 'hosts_allow')"
+  if [ "${HOSTS_ALLOW_JSON}" = "null" ] || [ -z "${HOSTS_ALLOW_JSON}" ]; then
+    HOSTS_ALLOW_JSON='[]'
+  fi
 else
   HOSTS_ALLOW_JSON='[]'
 fi
 if bashio::config.has_value 'interfaces'; then
   INTERFACES_JSON="$(bashio::config 'interfaces')"
+  if [ "${INTERFACES_JSON}" = "null" ] || [ -z "${INTERFACES_JSON}" ]; then
+    INTERFACES_JSON='[]'
+  fi
 else
   INTERFACES_JSON='[]'
 fi
-HOSTS_ALLOW="$(jq -r '.[]? // empty' <<<"${HOSTS_ALLOW_JSON}" | xargs || true)"
-INTERFACES="$(jq -r '.[]? // empty' <<<"${INTERFACES_JSON}" | xargs || true)"
+HOSTS_ALLOW="$(echo "${HOSTS_ALLOW_JSON}" | jq -r '.[]? // empty' | tr '\n' ' ' | xargs || true)"
+INTERFACES="$(echo "${INTERFACES_JSON}" | jq -r '.[]? // empty' | tr '\n' ' ' | xargs || true)"
 
 NETBIOS_NAME_OPT="$(bashio::config 'netbios_name' || true)"
 if [ -n "${NETBIOS_NAME_OPT:-}" ]; then
@@ -34,7 +40,7 @@ else
   NETBIOS_NAME="${NETBIOS_NAME:0:15}"
 fi
 
-mkdir -p "${MOUNT_POINT}" /data /etc/samba /root/.smb /run/samba /share
+mkdir -p "${MOUNT_POINT}" /data /etc/samba /root/.smb /run/samba /share 2>/dev/null || true
 
 cat > /etc/samba/smb.conf <<CONF
 [global]
