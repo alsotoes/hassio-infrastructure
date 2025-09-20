@@ -19,6 +19,11 @@ profile etcd flags=(attach_disconnected,mediate_deleted) {
   /run.sh ix,
   /bin/bash ix,
   /usr/bin/curl ix,
+  /usr/bin/bashio ix,
+
+  # Libraries
+  /lib/** mr,
+  /usr/lib/** mr,
 
   # Data directory (etcd storage)
   /data/ rw,
@@ -31,6 +36,7 @@ profile etcd flags=(attach_disconnected,mediate_deleted) {
   /etc/resolv.conf r,
   /etc/ssl/certs/ r,
   /etc/ssl/certs/** r,
+  /etc/nsswitch.conf r,
 
   # Proc filesystem
   @{PROC}/sys/net/core/somaxconn r,
@@ -38,13 +44,18 @@ profile etcd flags=(attach_disconnected,mediate_deleted) {
   @{PROC}/stat r,
   @{PROC}/loadavg r,
   @{PROC}/sys/kernel/hostname r,
+  @{PROC}/*/stat r,
+  @{PROC}/*/status r,
+  @{PROC}/sys/fs/file-max r,
 
   # Temp files
   /tmp/ rw,
   /tmp/** rw,
 
-  # Health check endpoint
-  /health r,
+  # Dev files
+  /dev/null rw,
+  /dev/zero r,
+  /dev/urandom r,
 
   # Deny dangerous operations
   deny /proc/sys/kernel/** w,
@@ -52,4 +63,6 @@ profile etcd flags=(attach_disconnected,mediate_deleted) {
   deny umount,
   deny ptrace,
   deny @{PROC}/sys/vm/** w,
+  deny capability sys_admin,
+  deny capability sys_ptrace,
 }

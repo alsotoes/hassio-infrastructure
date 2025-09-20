@@ -11,10 +11,11 @@ RUN if [ "${ARCH}" == "aarch64" ]; then export ARCH="arm64"; fi && mkdir -p /tmp
     curl -L ${DOWNLOAD_URL}/${ETCD_VER}/etcd-${ETCD_VER}-linux-${ARCH}.tar.gz -o /tmp/etcd.tar.gz && \
     tar xzvf /tmp/etcd.tar.gz -C /tmp/etcd-download --strip-components=1 --no-same-owner && \
     cp /tmp/etcd-download/etcd /tmp/etcd-download/etcdctl /tmp/etcd-download/etcdutl /usr/local/bin/ && \
+    chmod +x /usr/local/bin/etcd /usr/local/bin/etcdctl /usr/local/bin/etcdutl && \
     rm -rf /tmp/*
 
 COPY rootfs /
-RUN chmod a+x /run.sh 
+RUN chmod +x /run.sh
 
 WORKDIR /
 EXPOSE 2379/tcp 2380/tcp
@@ -23,7 +24,7 @@ HEALTHCHECK \
     --timeout=3s \
     CMD curl -f http://127.0.0.1:2379/health || exit 1
 
-CMD ["/run.sh"]
+ENTRYPOINT ["/run.sh"]
 
 # Build arguments
 ARG BUILD_VERSION

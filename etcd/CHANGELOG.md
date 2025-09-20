@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0
+
+- Fix: Container initialization permission error (/init)
+- Fix: AppArmor profile with proper library and device access
+- Improve: Changed CMD to ENTRYPOINT for reliable startup
+- Security: Enhanced AppArmor profile with additional protections
+
 ## 0.0.9
 
 - Add: AppArmor security profile for enhanced container security
