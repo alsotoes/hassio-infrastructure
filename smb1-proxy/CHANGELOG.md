@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.8
+
+- Added ingress support for seamless Home Assistant UI integration
+- Fixed AppArmor profile to allow s6-overlay init system execution
+- Enhanced web UI accessibility through Home Assistant interface
+
+## 1.2.7
+
+- Added web UI for status monitoring (accessible on port 8080)
+- Implemented JSON API endpoint for programmatic status checks
+- Added real-time service and mount health monitoring
+- Enhanced user experience with visual status indicators
+
 ## 1.2.6
 
 - Added health check monitoring for SMB mount status

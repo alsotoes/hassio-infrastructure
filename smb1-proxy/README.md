@@ -14,6 +14,11 @@ It can also expose the mounted data inside Home Assistant’s `/share` folder fo
 - Supports legacy **NTLMv1 authentication** if required.
 - Avahi + D-Bus included for mDNS/NetBIOS discovery.
 - Configurable access controls (`hosts_allow`, `interfaces`).
+- **Auto-recovery**: Automatically remounts on connection failures.
+- **Health monitoring**: Built-in health checks for mount status.
+- **Web UI**: Real-time status monitoring on port 8080.
+- **Graceful shutdown**: Clean unmounting and process termination.
+- **AppArmor security**: Enhanced container security profile.
 
 ---
 
@@ -56,6 +61,10 @@ share_link_name: "timecapsule"     # Path: /share/timecapsule
 
 - **Local access inside HA (if enabled):**
   - `/share/timecapsule`
+
+- **Web UI monitoring:**
+  - Status page: `http://<HA-IP>:8080`
+  - JSON API: `http://<HA-IP>:8080/api/status`
 
 ---
 

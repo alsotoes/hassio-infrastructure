@@ -1,0 +1,164 @@
+#!/bin/bash
+set -e
+
+PORT=8080
+MOUNT_POINT="$(bashio::config 'mount_point')"
+TC_HOST="$(bashio::config 'tc_host')"
+TC_SHARE="$(bashio::config 'tc_share')"
+REEXPORT_NAME="$(bashio::config 'reexport_share_name')"
+
+get_status() {
+    local status="OK"
+    local mount_status="Mounted"
+    local smbnetfs_status="Running"
+    local smbd_status="Running"
+    local last_check=$(date)
+    
+    # Check mount
+    if ! timeout 5 ls "${MOUNT_POINT}" >/dev/null 2>&1; then
+        mount_status="Failed"
+        status="ERROR"
+    fi
+    
+    # Check processes
+    if ! pgrep -f smbnetfs >/dev/null; then
+        smbnetfs_status="Stopped"
+        status="ERROR"
+    fi
+    
+    if ! pgrep -f smbd >/dev/null; then
+        smbd_status="Stopped"
+        status="ERROR"
+    fi
+    
+    cat <<EOF
+{
+    "status": "${status}",
+    "last_check": "${last_check}",
+    "mount": {
+        "status": "${mount_status}",
+        "path": "${MOUNT_POINT}",
+        "target": "${TC_HOST}/${TC_SHARE}"
+    },
+    "services": {
+        "smbnetfs": "${smbnetfs_status}",
+        "smbd": "${smbd_status}"
+    },
+    "config": {
+        "host": "${TC_HOST}",
+        "share": "${TC_SHARE}",
+        "reexport_name": "${REEXPORT_NAME}"
+    }
+}
+EOF
+}
+
+get_html() {
+    local json_status=$(get_status)
+    local status=$(echo "$json_status" | jq -r '.status')
+    local status_color="green"
+    [ "$status" = "ERROR" ] && status_color="red"
+    
+    cat <<EOF
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SMB1 Proxy Status</title>
+    <meta http-equiv="refresh" content="30">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .status { font-size: 24px; font-weight: bold; color: ${status_color}; margin-bottom: 20px; }
+        .section { margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 5px; }
+        .section h3 { margin-top: 0; color: #333; }
+        .info { display: flex; justify-content: space-between; margin: 10px 0; }
+        .label { font-weight: bold; }
+        .ok { color: green; }
+        .error { color: red; }
+        pre { background: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SMB1 Proxy Status Monitor</h1>
+        <div class="status">Status: ${status}</div>
+        
+        <div class="section">
+            <h3>Mount Information</h3>
+            <div class="info">
+                <span class="label">Target:</span>
+                <span>${TC_HOST}/${TC_SHARE}</span>
+            </div>
+            <div class="info">
+                <span class="label">Mount Path:</span>
+                <span>${MOUNT_POINT}</span>
+            </div>
+            <div class="info">
+                <span class="label">Mount Status:</span>
+                <span class="$(echo "$json_status" | jq -r '.mount.status' | tr '[:upper:]' '[:lower:]')">$(echo "$json_status" | jq -r '.mount.status')</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Services</h3>
+            <div class="info">
+                <span class="label">FUSE smbnetfs:</span>
+                <span class="$(echo "$json_status" | jq -r '.services.smbnetfs' | tr '[:upper:]' '[:lower:]')">$(echo "$json_status" | jq -r '.services.smbnetfs')</span>
+            </div>
+            <div class="info">
+                <span class="label">Samba Server:</span>
+                <span class="$(echo "$json_status" | jq -r '.services.smbd' | tr '[:upper:]' '[:lower:]')">$(echo "$json_status" | jq -r '.services.smbd')</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Configuration</h3>
+            <div class="info">
+                <span class="label">Re-export Share:</span>
+                <span>${REEXPORT_NAME}</span>
+            </div>
+            <div class="info">
+                <span class="label">Last Check:</span>
+                <span>$(echo "$json_status" | jq -r '.last_check')</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>JSON Status</h3>
+            <pre>$json_status</pre>
+        </div>
+        
+        <p><em>Page auto-refreshes every 30 seconds</em></p>
+    </div>
+</body>
+</html>
+EOF
+}
+
+# Simple HTTP server using netcat
+while true; do
+    {
+        read -r request
+        case "$request" in
+            "GET /api/status"*)
+                echo "HTTP/1.1 200 OK"
+                echo "Content-Type: application/json"
+                echo "Access-Control-Allow-Origin: *"
+                echo ""
+                get_status
+                ;;
+            "GET /"* | "GET /index.html"*)
+                echo "HTTP/1.1 200 OK"
+                echo "Content-Type: text/html"
+                echo ""
+                get_html
+                ;;
+            *)
+                echo "HTTP/1.1 404 Not Found"
+                echo "Content-Type: text/plain"
+                echo ""
+                echo "404 Not Found"
+                ;;
+        esac
+    } | nc -l -p $PORT -q 1
+done

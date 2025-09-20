@@ -1,0 +1,4 @@
+#!/usr/bin/with-contenv bashio
+
+bashio::log.info "Starting web status server on port 8080..."
+exec /usr/local/bin/status-server
