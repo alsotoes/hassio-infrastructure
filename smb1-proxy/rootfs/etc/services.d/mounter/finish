@@ -1,0 +1,6 @@
+#!/usr/bin/with-contenv bashio
+
+bashio::log.info "Cleaning up mounts..."
+if mountpoint -q /data/smbnet 2>/dev/null; then
+    fusermount -u /data/smbnet 2>/dev/null || umount -f /data/smbnet 2>/dev/null || true
+fi

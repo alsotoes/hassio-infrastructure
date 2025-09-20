@@ -19,6 +19,14 @@ profile smb1_proxy flags=(attach_disconnected,mediate_deleted) {
   network inet6 dgram,
   network inet6 stream,
 
+  # Init system and core executables
+  /init rix,
+  /usr/bin/s6-* rix,
+  /bin/s6-* rix,
+  /usr/bin/with-contenv rix,
+  /usr/bin/bashio rix,
+  /usr/bin/bashio.* rix,
+
   # File system access
   /usr/bin/smbnetfs rix,
   /usr/sbin/smbd rix,
@@ -48,8 +56,13 @@ profile smb1_proxy flags=(attach_disconnected,mediate_deleted) {
   /usr/bin/sleep rix,
   /usr/bin/ls rix,
   /usr/bin/mountpoint rix,
+  /usr/bin/pgrep rix,
+  /usr/bin/pkill rix,
+  /usr/bin/timeout rix,
+  /usr/bin/fusermount rix,
   /bin/mount rix,
   /bin/umount rix,
+  /usr/local/bin/health-check rix,
 
   # FUSE access
   /dev/fuse rw,
@@ -74,6 +87,12 @@ profile smb1_proxy flags=(attach_disconnected,mediate_deleted) {
   /tmp/ rw,
   /tmp/** rw,
 
+  # Service directories
+  /etc/cont-init.d/ r,
+  /etc/cont-init.d/** rix,
+  /etc/services.d/ r,
+  /etc/services.d/** rix,
+
   # System files
   /etc/passwd r,
   /etc/group r,
@@ -87,6 +106,8 @@ profile smb1_proxy flags=(attach_disconnected,mediate_deleted) {
   /proc/mounts r,
   /proc/*/mounts r,
   /proc/*/mountinfo r,
+  /proc/*/stat r,
+  /proc/*/cmdline r,
 
   # D-Bus and Avahi
   /usr/bin/dbus-daemon rix,
@@ -102,7 +123,6 @@ profile smb1_proxy flags=(attach_disconnected,mediate_deleted) {
   /dev/null rw,
 
   # Bashio access
-  /usr/bin/bashio.* rix,
   /opt/bashio/ r,
   /opt/bashio/** r,
 }

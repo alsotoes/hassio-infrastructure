@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.6
+
+- Added health check monitoring for SMB mount status
+- Implemented auto-remount on mount failures (30-second intervals)
+- Added graceful shutdown handling for all services
+- Fixed AppArmor profile to allow proper container initialization
+- Enhanced reliability with automatic recovery from network issues
+
 ## 1.2.5
 
 - Added AppArmor security profile for enhanced container security

@@ -1,0 +1,33 @@
+#!/bin/bash
+set -e
+
+MOUNT_POINT="$(bashio::config 'mount_point')"
+TC_HOST="$(bashio::config 'tc_host')"
+TC_SHARE="$(bashio::config 'tc_share')"
+
+# Check if mount point exists and is accessible
+if [ ! -d "${MOUNT_POINT}" ]; then
+    echo "UNHEALTHY: Mount point ${MOUNT_POINT} does not exist"
+    exit 1
+fi
+
+# Test if we can list the directory (basic connectivity test)
+if ! timeout 10 ls "${MOUNT_POINT}" >/dev/null 2>&1; then
+    echo "UNHEALTHY: Cannot access ${MOUNT_POINT} - mount may be stale"
+    exit 1
+fi
+
+# Check if smbnetfs is running
+if ! pgrep -f smbnetfs >/dev/null; then
+    echo "UNHEALTHY: smbnetfs process not running"
+    exit 1
+fi
+
+# Check if smbd is running
+if ! pgrep -f smbd >/dev/null; then
+    echo "UNHEALTHY: smbd process not running"
+    exit 1
+fi
+
+echo "HEALTHY: SMB mount and services operational"
+exit 0

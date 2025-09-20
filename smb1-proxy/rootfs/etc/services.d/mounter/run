@@ -16,34 +16,91 @@ for dir in "${MOUNT_POINT}" /data/smbnet /share; do
   [ ! -d "$dir" ] && mkdir -p "$dir"
 done
 
-bashio::log.info "Mounting via FUSE smbnetfs..."
-smbnetfs /data/smbnet -o allow_other,nonempty || { bashio::log.error "smbnetfs failed"; exit 1; }
-sleep 2
+# Cleanup function for graceful shutdown
+cleanup() {
+    bashio::log.info "Shutting down mounter service..."
+    if mountpoint -q /data/smbnet 2>/dev/null; then
+        bashio::log.info "Unmounting smbnetfs..."
+        fusermount -u /data/smbnet 2>/dev/null || umount -f /data/smbnet 2>/dev/null || true
+    fi
+    exit 0
+}
 
-if [ -d "/data/smbnet/${TC_HOST}/${TC_SHARE}" ]; then
-  TARGET="/data/smbnet/${TC_HOST}/${TC_SHARE}"
-elif [ -d "/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}" ]; then
-  TARGET="/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}"
-else
-  UPPER="$(echo "${TC_HOST}" | tr '[:lower:]' '[:upper:]')"
-  if [ -d "/data/smbnet/${UPPER}/${TC_SHARE}" ]; then
-    TARGET="/data/smbnet/${UPPER}/${TC_SHARE}"
-  else
-    bashio::log.error "Could not locate share inside smbnetfs tree."
-    ls -la /data/smbnet || true
+# Setup signal handlers for graceful shutdown
+trap cleanup SIGTERM SIGINT SIGQUIT
+
+# Function to mount smbnetfs
+mount_smbnetfs() {
+    bashio::log.info "Mounting via FUSE smbnetfs..."
+    
+    # Cleanup any existing mount
+    if mountpoint -q /data/smbnet 2>/dev/null; then
+        fusermount -u /data/smbnet 2>/dev/null || true
+        sleep 1
+    fi
+    
+    smbnetfs /data/smbnet -o allow_other,nonempty || { 
+        bashio::log.error "smbnetfs failed"; 
+        return 1; 
+    }
+    sleep 2
+
+    if [ -d "/data/smbnet/${TC_HOST}/${TC_SHARE}" ]; then
+        TARGET="/data/smbnet/${TC_HOST}/${TC_SHARE}"
+    elif [ -d "/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}" ]; then
+        TARGET="/data/smbnet/$(getent hosts "${TC_HOST}" | awk '{print $1}')/${TC_SHARE}"
+    else
+        UPPER="$(echo "${TC_HOST}" | tr '[:lower:]' '[:upper:]')"
+        if [ -d "/data/smbnet/${UPPER}/${TC_SHARE}" ]; then
+            TARGET="/data/smbnet/${UPPER}/${TC_SHARE}"
+        else
+            bashio::log.error "Could not locate share inside smbnetfs tree."
+            ls -la /data/smbnet || true
+            return 1
+        fi
+    fi
+
+    rm -rf "${MOUNT_POINT}" && ln -s "${TARGET}" "${MOUNT_POINT}"
+    bashio::log.info "FUSE smbnetfs mounted. ${MOUNT_POINT} -> ${TARGET}"
+    
+    # Expose under /share for other add-ons / file access
+    if [ "${EXPOSE_IN_SHARE}" = "true" ]; then
+        mkdir -p /share
+        LINK="/share/${SHARE_LINK_NAME}"
+        rm -rf "${LINK}" && ln -s "${MOUNT_POINT}" "${LINK}"
+        bashio::log.info "Exposed ${MOUNT_POINT} at ${LINK}"
+    fi
+    
+    return 0
+}
+
+# Initial mount
+if ! mount_smbnetfs; then
+    bashio::log.error "Initial mount failed, exiting"
     exit 1
-  fi
 fi
 
-rm -rf "${MOUNT_POINT}" && ln -s "${TARGET}" "${MOUNT_POINT}"
-bashio::log.info "FUSE smbnetfs mounted. ${MOUNT_POINT} -> ${TARGET}"
-
-# Expose under /share for other add-ons / file access
-if [ "${EXPOSE_IN_SHARE}" = "true" ]; then
-  mkdir -p /share
-  LINK="/share/${SHARE_LINK_NAME}"
-  rm -rf "${LINK}" && ln -s "${MOUNT_POINT}" "${LINK}"
-  bashio::log.info "Exposed ${MOUNT_POINT} at ${LINK}"
-fi
-
-exec tail -f /dev/null
+# Health monitoring and auto-remount loop
+while true; do
+    sleep 30
+    
+    # Check if mount is still healthy
+    if ! timeout 10 ls "${MOUNT_POINT}" >/dev/null 2>&1; then
+        bashio::log.warning "Mount appears stale, attempting remount..."
+        if mount_smbnetfs; then
+            bashio::log.info "Remount successful"
+        else
+            bashio::log.error "Remount failed, will retry in 30 seconds"
+        fi
+    fi
+    
+    # Check if smbnetfs process is still running
+    if ! pgrep -f smbnetfs >/dev/null; then
+        bashio::log.warning "smbnetfs process died, attempting remount..."
+        if mount_smbnetfs; then
+            bashio::log.info "Process restart successful"
+        else
+            bashio::log.error "Process restart failed, will retry in 30 seconds"
+        fi
+    fi
+done

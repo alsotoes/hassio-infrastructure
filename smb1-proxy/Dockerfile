@@ -6,6 +6,6 @@ RUN apt-get update  && apt-get install -y --no-install-recommends       samba sm
 
 COPY rootfs /
 
-RUN chmod 0755   /etc/cont-init.d/10-configure   /etc/services.d/dbus/run   /etc/services.d/avahi/run   /etc/services.d/mounter/run   /etc/services.d/smbd/run
+RUN chmod 0755   /etc/cont-init.d/10-configure   /etc/services.d/dbus/run   /etc/services.d/avahi/run   /etc/services.d/mounter/run   /etc/services.d/smbd/run   /etc/services.d/mounter/finish   /etc/services.d/smbd/finish   /usr/local/bin/health-check
 
 EXPOSE 137/udp 138/udp 139/tcp 445/tcp 631/tcp
