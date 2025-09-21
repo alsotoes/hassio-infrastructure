@@ -17,7 +17,9 @@ profile etcd flags=(attach_disconnected,mediate_deleted) {
   /usr/local/bin/etcdctl ix,
   /usr/local/bin/etcdutl ix,
   /run.sh ix,
+  /init ix,
   /bin/bash ix,
+  /bin/sh ix,
   /usr/bin/curl ix,
 
   # Libraries

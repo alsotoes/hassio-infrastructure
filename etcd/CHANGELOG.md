@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Fix: AppArmor profile permissions for /init and /bin/sh
+
 ## 0.1.2
 
 - Fix: run.sh execute permissions
