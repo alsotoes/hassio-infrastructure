@@ -25,7 +25,7 @@ etcd is written in Go and uses the [Raft](https://github.com/etcd-io/raft) [READ
 **Only use this add-on if you are running home assistant on SSD drives** otherwise, the server will constantly fail because of low IO.
 
 ## Security
-This add-on includes an AppArmor security profile that provides mandatory access controls to enhance container security and limit potential attack vectors.
+This add-on has AppArmor disabled to ensure compatibility with the Home Assistant environment.
 
 ## License
 GNU GENERAL PUBLIC [LICENSE](https://github.com/alsotoes/hassio-infrastructure/blob/main/LICENSE.md) Version 3

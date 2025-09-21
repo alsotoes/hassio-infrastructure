@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+- Disable: AppArmor security profile to resolve startup issues
+
 ## 0.1.3
 
 - Fix: AppArmor profile permissions for /init and /bin/sh
