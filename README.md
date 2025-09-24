@@ -55,6 +55,16 @@ This add-on acts as a **proxy**:
 
 [smb1-proxy addon documentation](https://github.com/alsotoes/hassio-infrastructure/blob/main/smb1-proxy/README.md)
 
+### &#10003; [afp2s3](https://github.com/alsotoes/hassio-infrastructure/blob/main/afp2s3)
+
+![Supports amd64 Architecture][amd64-shield]
+![Supports aarch64 Architecture][aarch64-shield]
+![Supports arm64 Architecture][arm64-shield]
+
+This add-on mounts a remote AFP (Apple Filing Protocol) share into the add-on's filesystem and exposes it as an S3-compatible object storage endpoint using Minio.
+
+[afp2s3 addon documentation](https://github.com/alsotoes/hassio-infrastructure/blob/main/afp2s3/README.md)
+
 ## License
 
 GNU GENERAL PUBLIC [LICENSE](LICENSE.md) Version 3
