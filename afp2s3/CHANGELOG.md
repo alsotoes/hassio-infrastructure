@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Add AFP mount validation to abort startup if the share cannot be mounted.
+- Ensure the image includes `mountpoint` by installing `util-linux`.
+
 ## 0.1.0
 
 - Initial release

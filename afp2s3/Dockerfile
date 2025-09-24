@@ -5,6 +5,7 @@ FROM ${BUILD_FROM}
 RUN apk add --no-cache \
     fuse3 \
     afpfs-ng \
+    util-linux \
     jq \
     wget
 

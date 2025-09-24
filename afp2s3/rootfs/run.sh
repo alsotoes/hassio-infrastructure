@@ -11,7 +11,16 @@ MOUNT_POINT="/mnt/afp"
 mkdir -p "${MOUNT_POINT}"
 
 # Mount AFP share
-afp_client mount -u "${AFP_USER}" -p "${AFP_PASSWORD}" "${AFP_SERVER}" "${MOUNT_POINT}"
+if ! afp_client mount -u "${AFP_USER}" -p "${AFP_PASSWORD}" "${AFP_SERVER}" "${MOUNT_POINT}"; then
+    echo "Failed to mount AFP share" >&2
+    exit 1
+fi
+
+# Verify mount succeeded before continuing
+if ! mountpoint -q "${MOUNT_POINT}"; then
+    echo "AFP mount validation failed" >&2
+    exit 1
+fi
 
 # Get architecture
 ARCH=$(uname -m)
