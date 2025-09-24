@@ -1,3 +1,4 @@
+---
 name: AFP to S3
 version: "0.1.0"
 slug: afp2s3
@@ -16,12 +17,10 @@ options:
   afp_server: "afp://server/share"
   afp_user: "user"
   afp_password: "password"
-  <STRIPPED>
 schema:
   afp_server: str
   afp_user: str
   afp_password: password
-  <STRIPPED>
 webui: "http://[HOST]:[PORT:9001]/"
 ports:
   9000/tcp: 9000
