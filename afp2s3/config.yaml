@@ -1,0 +1,28 @@
+name: AFP to S3
+version: "0.1.0"
+slug: afp2s3
+description: Mounts an AFP share and exposes it as an S3 endpoint using Minio.
+apparmor: true
+ingress: true
+ingress_port: 9001
+arch:
+  - amd64
+  - armv7
+  - aarch64
+init: false
+map:
+  - ssl
+options:
+  afp_server: "afp://server/share"
+  afp_user: "user"
+  afp_password: "password"
+  <STRIPPED>
+schema:
+  afp_server: str
+  afp_user: str
+  afp_password: password
+  <STRIPPED>
+webui: "http://[HOST]:[PORT:9001]/"
+ports:
+  9000/tcp: 9000
+  9001/tcp: 9001
