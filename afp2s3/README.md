@@ -1,4 +1,4 @@
-<img src="logo.png" alt="AFP to S3 Logo" width="256"/>
+![afp2s3 Logo](https://raw.githubusercontent.com/hassio-infrastructure/afp2s3/main/logo.png)
 
 # Home Assistant Add-on: afp2s3
 
