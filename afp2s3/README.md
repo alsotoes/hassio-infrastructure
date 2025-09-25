@@ -1,4 +1,4 @@
-![afp2s3 Logo](https://raw.githubusercontent.com/hassio-infrastructure/afp2s3/main/logo.png)
+![afp2s3 Logo](logo.png)
 
 # Home Assistant Add-on: afp2s3
 

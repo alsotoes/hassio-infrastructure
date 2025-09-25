@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+
+- Build `afpfs-ng` from source to guarantee AFP mount tools are shipped with the image.
+
 ## 0.1.4
 
 - Validate AFP mounts by requiring the `.com.apple.timemachine.supported` marker file from the remote share.
