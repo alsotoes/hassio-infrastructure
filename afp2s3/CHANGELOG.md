@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Disable the AppArmor profile to increase compatibility with environments that lack AppArmor support.
+
 ## 0.1.1
 
 - Add AFP mount validation to abort startup if the share cannot be mounted.

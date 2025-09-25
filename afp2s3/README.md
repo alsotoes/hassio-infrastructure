@@ -43,7 +43,7 @@ You can access the Minio web interface through the Home Assistant ingress by cli
 
 ## Security
 
-This add-on comes with an AppArmor profile to enhance security by restricting the add-on's permissions. The profile is located in the `apparmor.txt` file.
+This add-on previously shipped with an AppArmor profile to restrict permissions. AppArmor enforcement is currently disabled for compatibility, but the reference profile remains available in `apparmor.txt` should you wish to adapt it for your own deployment.
 
 ## License
 GNU GENERAL PUBLIC [LICENSE](https://github.com/alsotoes/hassio-infrastructure/blob/main/LICENSE.md) Version 3
