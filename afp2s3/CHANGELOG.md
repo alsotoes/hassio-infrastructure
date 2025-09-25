@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.4
+
+- Validate AFP mounts by requiring the `.com.apple.timemachine.supported` marker file from the remote share.
+
+## 0.1.3
+
+- Fix AFP mounting on systems where the `afp_client` binary is unavailable by adding fallbacks to other AFP utilities.
+
 ## 0.1.2
 
 - Disable the AppArmor profile to increase compatibility with environments that lack AppArmor support.

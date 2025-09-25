@@ -10,8 +10,42 @@ AFP_PASSWORD=$(jq --raw-output ".afp_password" /data/options.json)
 MOUNT_POINT="/mnt/afp"
 mkdir -p "${MOUNT_POINT}"
 
+mount_afp_share() {
+    local server="$1"
+    local mount_point="$2"
+    local user="$3"
+    local password="$4"
+
+    if command -v afp_client >/dev/null 2>&1; then
+        afp_client mount -u "${user}" -p "${password}" "${server}" "${mount_point}"
+        return $?
+    fi
+
+    local server_without_scheme="${server#afp://}"
+    local server_path
+    if [ "${server_without_scheme}" = "${server}" ]; then
+        server_path="${server}"
+    else
+        server_path="${server_without_scheme}"
+    fi
+    local url_with_credentials="afp://${user}:${password}@${server_path}"
+
+    if command -v mount_afp >/dev/null 2>&1; then
+        mount_afp "${url_with_credentials}" "${mount_point}"
+        return $?
+    fi
+
+    if command -v afpfs-ng >/dev/null 2>&1; then
+        afpfs-ng mount "${url_with_credentials}" "${mount_point}"
+        return $?
+    fi
+
+    echo "No AFP mounting utility (afp_client, mount_afp, afpfs-ng) is available." >&2
+    return 1
+}
+
 # Mount AFP share
-if ! afp_client mount -u "${AFP_USER}" -p "${AFP_PASSWORD}" "${AFP_SERVER}" "${MOUNT_POINT}"; then
+if ! mount_afp_share "${AFP_SERVER}" "${MOUNT_POINT}" "${AFP_USER}" "${AFP_PASSWORD}"; then
     echo "Failed to mount AFP share" >&2
     exit 1
 fi
@@ -19,6 +53,12 @@ fi
 # Verify mount succeeded before continuing
 if ! mountpoint -q "${MOUNT_POINT}"; then
     echo "AFP mount validation failed" >&2
+    exit 1
+fi
+
+TIMEMACHINE_MARKER="${MOUNT_POINT}/.com.apple.timemachine.supported"
+if [ ! -f "${TIMEMACHINE_MARKER}" ]; then
+    echo "AFP mount validation failed: Time Machine marker not found" >&2
     exit 1
 fi
 
