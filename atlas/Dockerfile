@@ -29,7 +29,7 @@ RUN . /opt/venv/bin/activate && pip install --no-cache-dir fastapi uvicorn
 RUN rm -f /etc/nginx/conf.d/default.conf /etc/nginx/sites-enabled/default || true
 
 # Copy from builder stage
-COPY --from=builder /atlas-repo/config/nginx/default.conf.template /config/nginx/default.conf.template
+COPY --from=builder /atlas-repo/config/nginx/default.conf /config/nginx/default.conf
 COPY --from=builder /atlas-repo/data/html/ /usr/share/nginx/html/
 COPY --from=builder /atlas-repo/config/scripts /config/scripts
 COPY --from=builder /atlas /config/bin/atlas
