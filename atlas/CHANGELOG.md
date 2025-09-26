@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.9 (2025-09-26)
+
+- Fixing build error because of venv not sourced.
+
 ## 0.0.8 (2025-09-26)
 
 - Logos converted from SVG to PNG.

@@ -1,6 +1,6 @@
 ---
 name: Atlas
-version: "0.0.8"
+version: "0.0.9"
 slug: atlas
 description: Network Infrastructure Visualizer
 arch:

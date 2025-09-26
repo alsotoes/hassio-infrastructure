@@ -1,5 +1,5 @@
 ARG BUILD_FROM
-ARG BUILD_ARCH
+ARG BUILDARCH
 # Stage 1: Build Go binary and clone repo
 FROM --platform=$BUILDARCH golang:1.22 AS builder
 
@@ -18,15 +18,14 @@ RUN go build -o /atlas .
 FROM $BUILD_FROM
 
 RUN apk add --no-cache \
-    nginx iputils-ping traceroute nmap sqlite net-tools curl jq ca-certificates git py3-pip \
-    && pip install --no-cache-dir fastapi uvicorn
+    nginx iputils-ping traceroute nmap sqlite net-tools curl jq ca-certificates git py3-pip
 
 # Create a virtual environment
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Install python packages
-RUN pip install --no-cache-dir fastapi uvicorn
+RUN . /optvenv/bin/activate && pip install --no-cache-dir fastapi uvicorn
 
 # Remove default Nginx config
 RUN rm -f /etc/nginx/conf.d/default.conf /etc/nginx/sites-enabled/default || true
