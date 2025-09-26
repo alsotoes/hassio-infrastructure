@@ -3,8 +3,6 @@ ARG BUILDARCH
 # Stage 1: Build Go binary and clone repo
 FROM --platform=$BUILDARCH golang:1.22 AS builder
 
-RUN apk add --no-cache git
-
 RUN git clone https://github.com/karam-ajaj/atlas.git /atlas-repo
 WORKDIR /atlas-repo
 RUN git checkout 3.1.11
