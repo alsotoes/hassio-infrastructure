@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.7
+
+- Refactor Dockerfile to fix build issues on arm64.
+- Use multi-stage build to compile afpfs-ng from source.
+- Use alpine-based image for the build stage.
+- Remove patch for afpfs-ng, as it is no longer needed.
+- Split RUN command in build stage into multiple commands.
+- Add DESTDIR to make install command.
+
 ## 0.1.6
 
 - Change the builder layer to arm64v8/ubuntu:jammy
