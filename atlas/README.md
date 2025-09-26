@@ -1,6 +1,6 @@
 # Home Assistant Atlas Addon
 
-![Atlas Logo](logo.svg)
+![Atlas Logo](logo.png)
 
 This is a Home Assistant addon for the [Atlas](https://github.com/karam-ajaj/atlas) network infrastructure visualizer.
 

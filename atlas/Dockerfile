@@ -25,7 +25,7 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Install python packages
-RUN . /optvenv/bin/activate && pip install --no-cache-dir fastapi uvicorn
+RUN . /opt/venv/bin/activate && pip install --no-cache-dir fastapi uvicorn
 
 # Remove default Nginx config
 RUN rm -f /etc/nginx/conf.d/default.conf /etc/nginx/sites-enabled/default || true
