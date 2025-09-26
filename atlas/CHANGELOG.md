@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4 (2025-09-26)
+
+- Fixed Dockerfile build arguments.
+
 ## 0.0.3 (2025-09-26)
 
 - Fixed multi-architecture build.

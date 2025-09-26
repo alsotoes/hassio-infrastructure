@@ -1,6 +1,8 @@
+
 ARG BUILD_FROM
+ARG BUILD_ARCH
 # Stage 1: Build Go binary and clone repo
-FROM --platform=$BUILD_ARCH golang:1.22 AS builder
+FROM --platform=$BUILDARCH golang:1.22 AS builder
 
 RUN apk add --no-cache git
 
@@ -29,8 +31,9 @@ COPY --from=builder /atlas-repo/data/html/ /usr/share/nginx/html/
 COPY --from=builder /atlas-repo/config/scripts /config/scripts
 COPY --from=builder /atlas /config/bin/atlas
 
+COPY rootfs /
 # Make all shell scripts executable
-RUN chmod +x /config/scripts/*.sh
+RUN chmod +x /config/scripts/*.sh /run.sh
 
 # Set default ports (can be overridden at runtime)
 ENV ATLAS_UI_PORT=8888
