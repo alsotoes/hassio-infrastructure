@@ -3,6 +3,7 @@
 ## 0.1.5
 
 - Build `afpfs-ng` from source to guarantee AFP mount tools are shipped with the image.
+- Patch upstream `afpfs-ng` to fix a compile-time error when closing Desktop database handles.
 
 ## 0.1.4
 
