@@ -1,0 +1,30 @@
+
+name: Atlas
+version: "3.1.11"
+slug: atlas
+description: Network Infrastructure Visualizer
+arch:
+  - amd64
+  - aarch64
+  - armv7
+init: false
+panel_icon: mdi:lan
+panel_title: Atlas
+webui: "[PROTO:ssl]://[HOST]:[PORT:8888]"
+ports:
+  8888/tcp: 8888
+ports_description:
+  8888/tcp: Web UI
+host_network: true
+host_pid: true
+docker_api: true
+full_access: true
+auto_uart: true
+apparmor: false
+hassio_api: true
+hassio_role: manager
+homeassistant_api: false
+gpio: true
+devicetree: true
+uart: true
+usb: true

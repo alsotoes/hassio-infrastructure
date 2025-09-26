@@ -1,0 +1,3 @@
+[submodule "atlas/atlas-github"]
+	path = atlas/atlas-github
+	url = https://github.com/karam-ajaj/atlas.git
