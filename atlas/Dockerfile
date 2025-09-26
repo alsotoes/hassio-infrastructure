@@ -1,4 +1,5 @@
-# Stage 1: Build Go binary
+
+# Stage 1: Build Go binary and clone repo
 FROM golang:1.22 AS builder
 
 RUN apk add --no-cache git
@@ -7,11 +8,10 @@ RUN git clone https://github.com/karam-ajaj/atlas.git /atlas-repo
 WORKDIR /atlas-repo
 RUN git checkout 3.1.11
 
-WORKDIR /app
-COPY /atlas-repo/config/atlas_go /app
-# If you have go.mod in config/atlas_go, this is enough; otherwise add module init
-RUN if [ ! -f go.mod ]; then go mod init atlas || true; fi
-RUN go build -o atlas .
+# Build the Go binary
+WORKDIR /atlas-repo/config/atlas_go
+RUN go mod init atlas || true
+RUN go build -o /atlas .
 
 # Stage 2: Runtime
 FROM ghcr.io/home-assistant/amd64-base-python:3.9-alpine3.14
@@ -20,20 +20,14 @@ RUN apk add --no-cache \
     nginx iputils-ping traceroute nmap sqlite net-tools curl jq ca-certificates git \
     && pip install --no-cache-dir fastapi uvicorn
 
-RUN git clone https://github.com/karam-ajaj/atlas.git /atlas-repo
-WORKDIR /atlas-repo
-RUN git checkout 3.1.11
-
 # Remove default Nginx config
 RUN rm -f /etc/nginx/conf.d/default.conf /etc/nginx/sites-enabled/default || true
 
-# Copy template & static UI content
-COPY /atlas-repo/config/nginx/default.conf.template /config/nginx/default.conf.template
-COPY /atlas-repo/data/html/ /usr/share/nginx/html/
-
-# Copy scripts and binary
-COPY /atlas-repo/config/scripts /config/scripts
-COPY --from=builder /app/atlas /config/bin/atlas
+# Copy from builder stage
+COPY --from=builder /atlas-repo/config/nginx/default.conf.template /config/nginx/default.conf.template
+COPY --from=builder /atlas-repo/data/html/ /usr/share/nginx/html/
+COPY --from=builder /atlas-repo/config/scripts /config/scripts
+COPY --from=builder /atlas /config/bin/atlas
 
 # Make all shell scripts executable
 RUN chmod +x /config/scripts/*.sh
