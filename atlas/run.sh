@@ -39,8 +39,8 @@ fi
 
 # Start FastAPI
 log "🚀 Starting FastAPI backend on port $ATLAS_API_PORT..."
-export PYTHONPATH=/config
-uvicorn atlas-github.config.scripts.app:app --host 0.0.0.0 --port "$ATLAS_API_PORT" > /config/logs/uvicorn.log 2>&1 &
+export PYTHONPATH=/atlas-repo/config
+uvicorn scripts.app:app --host 0.0.0.0 --port "$ATLAS_API_PORT" > /config/logs/uvicorn.log 2>&1 &
 API_PID=$!
 
 # Kick off scans (non-blocking)
