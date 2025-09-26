@@ -1,4 +1,3 @@
-
 ARG BUILD_FROM
 ARG BUILD_ARCH
 # Stage 1: Build Go binary and clone repo
@@ -19,7 +18,7 @@ RUN go build -o /atlas .
 FROM $BUILD_FROM
 
 RUN apk add --no-cache \
-    nginx iputils-ping traceroute nmap sqlite net-tools curl jq ca-certificates git \
+    nginx iputils-ping traceroute nmap sqlite net-tools curl jq ca-certificates git python3-pip \
     && pip install --no-cache-dir fastapi uvicorn
 
 # Remove default Nginx config

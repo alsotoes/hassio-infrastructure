@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5 (2025-09-26)
+
+- Added python3-pip to fix pip not found error.
+
 ## 0.0.4 (2025-09-26)
 
 - Fixed Dockerfile build arguments.
