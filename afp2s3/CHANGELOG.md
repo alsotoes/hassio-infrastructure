@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6
+
+- Change the builder layer to arm64v8/ubuntu:jammy
+
 ## 0.1.5
 
 - Build `afpfs-ng` from source to guarantee AFP mount tools are shipped with the image.

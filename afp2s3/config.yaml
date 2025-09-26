@@ -1,6 +1,6 @@
 ---
 name: AFP to S3
-version: "0.1.5"
+version: "0.1.6"
 slug: afp2s3
 description: Mounts an AFP share and exposes it as an S3 endpoint using Minio.
 url: https://github.com/alsotoes/hassio-infrastructure/tree/main/afp2s3
