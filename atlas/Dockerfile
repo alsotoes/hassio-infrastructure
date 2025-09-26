@@ -21,6 +21,13 @@ RUN apk add --no-cache \
     nginx iputils-ping traceroute nmap sqlite net-tools curl jq ca-certificates git py3-pip \
     && pip install --no-cache-dir fastapi uvicorn
 
+# Create a virtual environment
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install python packages
+RUN pip install --no-cache-dir fastapi uvicorn
+
 # Remove default Nginx config
 RUN rm -f /etc/nginx/conf.d/default.conf /etc/nginx/sites-enabled/default || true
 

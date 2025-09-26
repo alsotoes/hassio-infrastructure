@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.8 (2025-09-26)
+
+- Logos converted from SVG to PNG.
+
+## 0.0.7 (2025-09-26)
+
+- Used virtual environment for python packages.
+
+## 0.0.6 (2025-09-26)
+
+- Added logo and icon.
+
 ## 0.0.5 (2025-09-26)
 
 - Added python3-pip to fix pip not found error.
