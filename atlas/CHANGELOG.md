@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.10
+
+- Proped WebUI configuration
+- Database creation issue fixed
+
 ## 0.0.9 (2025-09-26)
 
 - Fixing build error because of venv not sourced.
