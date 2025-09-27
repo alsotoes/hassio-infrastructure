@@ -15,7 +15,7 @@ ATLAS_API_PORT=$(bashio::addon.port 8889)
 # Render Nginx config (IMPORTANT: restrict variables so $uri etc. survive)
 if [[ -f /config/nginx/default.conf.template ]]; then
   log "Rendering Nginx template (UI:$ATLAS_UI_PORT API:$ATLAS_API_PORT)"
-  envsubst '${ATLAS_UI_PORT} ${ATLAS_API_PORT}' < /config/nginx/default.conf.template > /etc/nginx/conf.d/default.conf
+  envsubst "${ATLAS_UI_PORT} ${ATLAS_API_PORT}" < /config/nginx/default.conf.template > /etc/nginx/conf.d/default.conf
 else
   log "⚠️ Template /config/nginx/default.conf.template missing. Using existing config."
 fi
@@ -41,7 +41,7 @@ fi
 log "🚀 Starting FastAPI backend on port $ATLAS_API_PORT..."
 export PYTHONPATH=/config
 uvicorn app:app --host 0.0.0.0 --port "$ATLAS_API_PORT" > /config/logs/uvicorn.log 2>&1 &
-API_PID=$!
+export API_PID=$!
 
 # Kick off scans (non-blocking)
 if [[ -x /config/bin/atlas ]]; then

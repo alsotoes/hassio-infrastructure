@@ -1,7 +1,6 @@
-ARG BUILD_FROM
 ARG BUILDARCH
 # Stage 1: Build Go binary and clone repo
-FROM --platform=$BUILDARCH golang:1.22 AS builder
+FROM golang:1.22 AS builder
 
 RUN git clone https://github.com/karam-ajaj/atlas.git /atlas-repo
 WORKDIR /atlas-repo
@@ -13,17 +12,19 @@ RUN go mod init atlas || true
 RUN go build -o /atlas .
 
 # Stage 2: Runtime
+ARG BUILD_FROM
 FROM $BUILD_FROM
 
 RUN apk add --no-cache \
-    nginx iputils-ping traceroute nmap sqlite net-tools curl jq ca-certificates git py3-pip
+    nginx iputils-ping traceroute nmap sqlite net-tools curl jq ca-certificates git py3-pip && \
+    python3 -m venv /opt/venv
 
 # Create a virtual environment
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
 
 # Install python packages
-RUN . /opt/venv/bin/activate && pip install --no-cache-dir fastapi uvicorn
+ENV PATH="/opt/venv/bin:$PATH"
+# hadolint ignore=SC1091
+RUN source /opt/venv/bin/activate && pip install --no-cache-dir fastapi uvicorn
 
 # Remove default Nginx config
 RUN rm -f /etc/nginx/conf.d/default.conf /etc/nginx/sites-enabled/default || true
