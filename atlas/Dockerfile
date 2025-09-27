@@ -42,5 +42,6 @@ ENV ATLAS_UI_PORT=8888
 ENV ATLAS_API_PORT=8889
 
 # Entrypoint: initializes DB, runs scans, launches FastAPI and Nginx
-EXPOSE 8888 8889
+EXPOSE 8888/tcp 
+EXPOSE 8889/tcp
 CMD ["/run.sh"]
