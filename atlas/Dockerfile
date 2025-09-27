@@ -1,4 +1,4 @@
-ARG BUILDARCH
+ARG BUILD_FROM
 # Stage 1: Build Go binary and clone repo
 FROM golang:1.22 AS builder
 
@@ -12,8 +12,7 @@ RUN go mod init atlas || true
 RUN go build -o /atlas .
 
 # Stage 2: Runtime
-ARG BUILD_FROM
-FROM $BUILD_FROM
+FROM ${BUILD_FROM}
 
 RUN apk add --no-cache \
     nginx iputils-ping traceroute nmap sqlite net-tools curl jq ca-certificates git py3-pip && \
