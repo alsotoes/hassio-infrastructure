@@ -14,7 +14,8 @@ panel_icon: mdi:lan
 panel_title: Atlas
 webui: "[PROTO:ssl]://[HOST]:[PORT:8888]"
 ingress: true
-ingress_port: 8099
+ingress_port: 8888
+startup: services
 ports:
   8888/tcp: 8888
 ports_description:
