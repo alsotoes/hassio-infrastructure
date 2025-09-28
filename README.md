@@ -43,28 +43,6 @@ etcd is a distributed reliable key-value store for the most critical data of a d
 
 [etcd addon documentation](https://github.com/alsotoes/hassio-infrastructure/blob/main/etcd/README.md)
 
-### &#10003; [smb1-proxy addon](https://github.com/alsotoes/hassio-infrastructure/blob/main/smb1-proxy)
-
-![Supports amd64 Architecture][amd64-shield]
-![Supports aarch64 Architecture][aarch64-shield]
-![Supports arm64 Architecture][arm64-shield]
-
-This add-on acts as a **proxy**:
-- Connects to the legacy SMB1 share.
-- Re-exports it as a modern **SMB2/SMB3 share** that Home Assistant and other devices can mount safely.
-
-[smb1-proxy addon documentation](https://github.com/alsotoes/hassio-infrastructure/blob/main/smb1-proxy/README.md)
-
-### &#10003; [afp2s3](https://github.com/alsotoes/hassio-infrastructure/blob/main/afp2s3)
-
-![Supports amd64 Architecture][amd64-shield]
-![Supports aarch64 Architecture][aarch64-shield]
-![Supports arm64 Architecture][arm64-shield]
-
-This add-on mounts a remote AFP (Apple Filing Protocol) share into the add-on's filesystem and exposes it as an S3-compatible object storage endpoint using Minio.
-
-[afp2s3 addon documentation](https://github.com/alsotoes/hassio-infrastructure/blob/main/afp2s3/README.md)
-
 ## License
 
 GNU GENERAL PUBLIC [LICENSE](LICENSE.md) Version 3

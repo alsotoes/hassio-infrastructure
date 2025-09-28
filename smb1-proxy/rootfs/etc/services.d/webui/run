@@ -1,8 +1,0 @@
-#!/usr/bin/with-contenv bashio
-
-bashio::log.info "Starting web status server on port 9876..."
-
-# Wait for configuration to be ready
-sleep 5
-
-exec /usr/local/bin/status-server
