@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.4
+
+- Making /etc/cups persistent and a volume.
+- Changed slug to `cupsik`.
+
 ## 1.4.3
 
 - Fixing bashio image errors.

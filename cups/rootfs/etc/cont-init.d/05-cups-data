@@ -1,0 +1,13 @@
+#!/usr/bin/with-contenv bashio
+
+bashio::log.info "Preparing CUPS configuration directory..."
+# If /data/cups doesn't exist, copy the default configuration from the image
+if [ ! -d /data/cups ]; then
+    bashio::log.info "No existing configuration found. Creating default CUPS configuration in /data/cups."
+    cp -R /etc/cups /data/
+fi
+
+# Remove the original /etc/cups and symlink it to the persistent /data/cups
+rm -rf /etc/cups
+ln -s /data/cups /etc/cups
+bashio::log.info "/etc/cups is now linked to /data/cups."

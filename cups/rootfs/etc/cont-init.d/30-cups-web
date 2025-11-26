@@ -7,8 +7,6 @@ REQUIRE_AUTH="$(bashio::config 'require_auth_on_admin')"
 ALLOW_LIST_JSON="$(bashio::config 'admin_allow_subnets')"
 ALLOW_LIST="$(echo "${ALLOW_LIST_JSON}" | jq -r '.[]' | xargs || true) 172.30.0.0/16"
 
-mkdir -p /etc/cups
-
 if [ "${ENABLE_WEB}" != "true" ]; then
   bashio::log.info "Web Admin disabled by config"
   exit 0

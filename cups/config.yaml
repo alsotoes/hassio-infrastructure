@@ -1,8 +1,8 @@
 ---
 name: CUPS Print Server
-slug: cups
+slug: cupsik
 description: "CUPS printing system with Avahi for AirPrint/IPP and Web Admin"
-version: "1.4.3"
+version: "1.4.4"
 arch:
   - aarch64
 startup: services

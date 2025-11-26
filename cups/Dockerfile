@@ -53,7 +53,8 @@ RUN set -eux; \
     rm -f /tmp/hp-plugin.exp
 
 COPY rootfs /
-RUN chmod 0755 /etc/cont-init.d/10-avahi \
+RUN chmod 0755 /etc/cont-init.d/05-cups-data \
+    /etc/cont-init.d/10-avahi \
     /etc/cont-init.d/20-cups-service-name \
     /etc/cont-init.d/30-cups-web \
     /etc/services.d/dbus/run \
